@@ -1,0 +1,21 @@
+QGroupBox:title
+{
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 0px 5px 0px 5px;
+}
+
+QGroupBox
+{
+    margin-top: 10px;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+QPushQuitButton
+{
+    padding: 5px 5px 5px 5px;
+    margin: 5px 5px 5px 5px;
+}
