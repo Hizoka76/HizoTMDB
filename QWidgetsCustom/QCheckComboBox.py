@@ -2,6 +2,51 @@
 
 # Basé sur : https://gis.stackexchange.com/questions/350148/qcombobox-multiple-selection-pyqt5
 
+# tester setDefaultValues
+    # essayer d'envoyer des textes inconnus, des index innexistants
+    # essayé de l'utiliser avant items et item
+
+# Mettre à jour setStateItems pour utiliser du texte ou des indexs
+
+
+# Use:
+    # Widget = QCheckComboBox()
+        # Arguments possible:
+            # TristateMode: Activate the tristate checkbox (True/1)
+            # CopyIcon: Icon of the copy item in the context menu (QIcon/str)
+            # UndoIcon: Icon of the undo item in the context menu (QIcon/str)
+            # RedoIcon: Icon of the redo item in the context menu (QIcon/str)
+            # AllCheckIcon: Icon of the all check item in the context menu (QIcon/str)
+            # AllUncheckIcon: Icon of the all uncheck item in the context menu (QIcon/str)
+            # AllPatriallyCheckIcon: Icon of the all partially check item in the context menu (QIcon/str)
+            # DefaultValuesIcon: Icon of the restore default value item in the context menu (QIcon/str)
+            # Title: Add an itme at index 0 with this text, it's not editable (str)
+            # TitleIcon: Icon to add with the title (QIcon/str)
+            # Items: Items to inject into the ComboBox (List of dict like [{text:, data:, state:, icon:}])
+            # DefaultValues: Items with their state (State, Values, ValueType, MatchFlag)
+                # State: Checkbox state to attribute as Values
+                # Values: (list of) str or int of the items
+                # ValueType: To know the type of Values (Text, Data, Index) (Defaut: Text)
+                # MatchFlag: To the search of the texts (Defaut: Qt.MatchExactly)
+
+    # Fonctions of the class:
+        # setIcons: Icons of the items action
+        # setTristateMode: Activate the tristate mod
+        # updateLang:
+        # addItem: Add an Item into the ComboBox (text, data=None, state=None, icon=None, default=True)
+        # addItems: Add Items into the ComboBox (List of dict like [{text:, data:, state:, icon:}])
+        # setStateItems: Use a State for Items (CheckBox State, (list of) index)
+        # setStateAll: Use a State for all ChecBoox (CheckBox State)
+        # setTitle: Insert at start an item with Title and its Icon (Title:str, Icon:QIcon/str)
+        # setDefaultValues:
+        # resetDefaultValues: Reset all CheckBox with the DefaultValues
+        # setReUndoAction: Undo or Redo action (Action:"Undo"/"Redo")
+        # copyText: Copy into clipboard the current QLineEdit
+        # currentText: Return the current text of the QLineEdit
+        # currentData: Return the data of item selected
+
+
+
 # Old :
     # Mise à jour du texte du lineEdit lors d'un changement d'état d'une case à cochée
     # utilisation de itemChanged et non de dataChanged qui ne précise pas l'item modifié
@@ -37,7 +82,7 @@ try:
     # Modules PySide6
     from PySide6.QtGui import QPalette, QFontMetrics, QStandardItem, QAction, QIcon, QCursor, QKeySequence
     from PySide6.QtWidgets import QComboBox, QStyledItemDelegate, QLineEdit, QListView, QMenu, QApplication
-    from PySide6.QtCore import QEvent, Qt, QCoreApplication, QSize
+    from PySide6.QtCore import QEvent, Qt, QCoreApplication, QSize, QFileInfo, QMimeDatabase, QMimeType
 
     PySideVersion = 6
 
@@ -48,14 +93,14 @@ except:
         # Modules PySide2
         from PySide2.QtGui import QPalette, QFontMetrics, QStandardItem, QIcon, QCursor, QKeySequence
         from PySide2.QtWidgets import QComboBox, QStyledItemDelegate, QLineEdit, QListView, QMenu, QApplication, QAction
-        from PySide2.QtCore import QEvent, Qt, QCoreApplication, QSize
+        from PySide2.QtCore import QEvent, Qt, QCoreApplication, QSize, QFileInfo, QMimeDatabase, QMimeType
 
     except:
         try:
             # Modules PyQt5
             from PyQt5.QtGui import QPalette, QFontMetrics, QStandardItem, QIcon, QCursor, QKeySequence
             from PyQt5.QtWidgets import QComboBox, QStyledItemDelegate, QLineEdit, QListView, QMenu, QApplication, QAction
-            from PyQt5.QtCore import QEvent, Qt, QCoreApplication, QSize
+            from PyQt5.QtCore import QEvent, Qt, QCoreApplication, QSize, QFileInfo, QMimeDatabase, QMimeType
 
         except:
             print("QCheckComboBox : Impossible de trouver PySide6 / PySide2 / PyQt5.")
@@ -76,7 +121,7 @@ class QCheckComboBox(QComboBox):
         super().__init__()
 
         # Liste des arguments possibles
-        CamelArgs = ["TristateMode", "CopyIcon", "UndoIcon", "RedoIcon", "AllCheckIcon", "AllUncheckIcon", "AllPatriallyCheckIcon", "Title", "TitleIcon", "Items"]
+        CamelArgs = ["TristateMode", "CopyIcon", "UndoIcon", "RedoIcon", "AllCheckIcon", "AllUncheckIcon", "AllPatriallyCheckIcon", "DefaultValuesIcon", "Title", "TitleIcon", "Items", "DefaultValues"]
 
         # Retravaille le dictionnaire pour prise en compte d'une mauvais casse
         for Key, Value in dict(kwargs).items():
@@ -104,6 +149,13 @@ class QCheckComboBox(QComboBox):
 
         # Indicateur de la présence d'un titre pour ne pas prendre en compte le 1er élément
         self.TitleExists = False
+
+        # Liste des valeurs par défaut
+        self.DefaultValuesSave = None
+        self.DefaultValues = {
+            Qt.Checked: [],
+            Qt.PartiallyChecked: []
+            }
 
         # Use custom delegate
         self.setItemDelegate(QCheckComboBox.Delegate())
@@ -135,10 +187,9 @@ class QCheckComboBox(QComboBox):
             "Redo": QIcon.fromTheme("edit-redo"),
             "AllCheck": QIcon.fromTheme("edit-select-all"),
             "AllPatriallyCheck": QIcon.fromTheme("select-rectangular"),
-            "AllUncheck": QIcon.fromTheme("edit-select-none")
+            "AllUncheck": QIcon.fromTheme("edit-select-none"),
+            "DefaultValues": QIcon.fromTheme("edit-reset")
             }
-
-
 
 
         # Si le mode TristateMode est passé lors de la création de la classe
@@ -152,17 +203,24 @@ class QCheckComboBox(QComboBox):
             Redo=kwargs.get("RedoIcon"),
             AllCheck=kwargs.get("AllCheckIcon"),
             AllUncheck=kwargs.get("AllUncheckIcon"),
-            AllPatriallyCheck=kwargs.get("AllPatriallyCheckIcon")
+            AllPatriallyCheck=kwargs.get("AllPatriallyCheckIcon"),
+            DefaultValues=kwargs.get("DefaultValuesIcon"),
             )
 
         # Si le titre est passé lors de la création de la classe
         if "Title" in kwargs:
-            # L'icône est facultative'
-            self.setTitle(kwargs["Title"], kwargs.get("TitleIcon"))
+            # L'icône est facultative
+            self.setTitle(kwargs["Title"], self.iconCreation(kwargs.get("TitleIcon")))
 
         # Si des items sont passées lors de la création de la classe
         if "Items" in kwargs:
             self.addItems(kwargs["Items"])
+
+        # Si des valeurs par défaut ont été données
+        if "DefaultValues" in kwargs:
+            if isinstance(kwargs["DefaultValues"], dict):
+                for State, Items in kwargs["DefaultValues"].items():
+                    self.setDefaultValues(State, Items)
 
 
         # Chargement des textes de base
@@ -172,16 +230,40 @@ class QCheckComboBox(QComboBox):
     #========================================================================
     def setIcons(self, **kwargs):
         """Fonction permettant de changer les icônes par défaut."""
-        for IconName in ["Copy", "Undo", "Redo", "AllCheck", "AllUncheck", "AllPatriallyCheck"]:
+        for IconName in ["Copy", "Undo", "Redo", "AllCheck", "AllUncheck", "AllPatriallyCheck", "DefaultValues"]:
             Icon = kwargs.get(IconName)
 
-            # Si la valeur est déjà une QIcon, on l'utilise directement
-            if isinstance(Icon, QIcon):
-                self.MenuIcons[IconName] = Icon
+            if Icon:
+                self.MenuIcons[IconName] = self.iconCreation(Icon)
 
-            # Si c'est un texte, on le transforme en QIcon avant de l'utiliser
-            elif isinstance(Icon, str):
-                self.MenuIcons[IconName] = QIcon.fromTheme(Icon)
+
+    #========================================================================
+    def iconCreation(self, Icon):
+        """Fonction renvoyant une QIcon depuis une QIcon ou un texte."""
+        if Icon is None:
+            return QIcon()
+
+        # Si la valeur est déjà une QIcon, on la renvoie directement
+        if isinstance(Icon, QIcon):
+            return Icon
+
+        # Si c'est un texte, on la transforme en QIcon avant de le renvoyer
+        elif isinstance(Icon, str):
+            File = QFileInfo(Icon)
+            MimeBase = QMimeDatabase()
+            MimeType = MimeBase.mimeTypeForFile(Icon).name().split("/")[0].lower()
+
+            # Si l'image existe
+            if File.exists() and MimeType == "image":
+                return QIcon(Icon)
+
+            # Si le texte n'a pas d'extension ni de path
+            if not File.completeSuffix() and File.filePath() == Icon:
+                return QIcon.fromTheme(Icon)
+
+            # Si ce n'est pas une image on renvoie un QIcon vide
+            if MimeType != "image":
+                return QIcon()
 
 
     #========================================================================
@@ -274,6 +356,14 @@ class QCheckComboBox(QComboBox):
         AllUncheck.setShortcut(QKeySequence("Ctrl+U"))
         self.contextMenu.addAction(AllUncheck)
 
+        # Création de l'action de restauration des données par défaut
+        if self.DefaultValues[Qt.Checked] or self.DefaultValues[Qt.PartiallyChecked]:
+            self.contextMenu.addSeparator()
+            ResetDefaultValues = QAction(self.MenuIcons["DefaultValues"], QCoreApplication.translate("QCheckComboBox", "Restore the default values"), self.contextMenu)
+            ResetDefaultValues.triggered.connect(self.resetDefaultValues)
+            ResetDefaultValues.setShortcut(QKeySequence("Ctrl+R"))
+            self.contextMenu.addAction(ResetDefaultValues)
+
 
     #========================================================================
     def comboHighlighted(self, Index):
@@ -303,23 +393,13 @@ class QCheckComboBox(QComboBox):
                     return True
 
                 elif Event.key() in [Qt.Key_Down, Qt.Key_Space, Qt.Key_Return, Qt.Key_Enter, Qt.Key_Tab]:
-                    # Si la popup est visible, on la case sinon on l'affiche
-                    if self.closeOnLineEditClick:
-                        self.hidePopup()
-
-                    else:
-                        self.showPopup()
+                    self.popupEvent()
 
                 return True
 
             # Si c'est un clic droit sur la petite flèche, on affiche un menu modifié
             elif Event.type() == QEvent.ContextMenu:
-                # Affichage du menu là où se trouve la souris en fonction de la version de qt
-                if PySideVersion == 6:
-                    self.contextMenu.exec(QCursor.pos())
-
-                else:
-                    self.contextMenu.exec_(QCursor.pos())
+                self.menuEvent()
 
                 # Bloque l'événement
                 return True
@@ -329,24 +409,14 @@ class QCheckComboBox(QComboBox):
         elif Object == self.lineEdit():
             # Si l'événement est le relâchement d'un clic (Event.button() pour savoir lequel)
             if Event.type() == QEvent.MouseButtonRelease:
-                # Si la popup est visible, on la case sinon on l'affiche
-                if self.closeOnLineEditClick:
-                    self.hidePopup()
-
-                else:
-                    self.showPopup()
+                self.popupEvent()
 
                 # Bloque l'événement
                 return True
 
             # Si c'est un clic droit, on affiche un menu modifié
             elif Event.type() == QEvent.ContextMenu:
-                # Affichage du menu là où se trouve la souris en fonction de la version de qt
-                if PySideVersion == 6:
-                    self.contextMenu.exec(QCursor.pos())
-
-                else:
-                    self.contextMenu.exec_(QCursor.pos())
+                self.menuEvent()
 
                 # Bloque l'événement
                 return True
@@ -375,12 +445,7 @@ class QCheckComboBox(QComboBox):
 
                 # Si c'est un clic droit, on affiche le menu d'action
                 elif Event.button() == Qt.MouseButton.RightButton:
-                    # Affichage du menu là où se trouve la souris en fonction de la version de qt
-                    if PySideVersion == 6:
-                        self.contextMenu.exec(QCursor.pos())
-
-                    else:
-                        self.contextMenu.exec_(QCursor.pos())
+                    self.menuEvent()
 
                 # Bloque l'événement
                 return True
@@ -429,10 +494,11 @@ class QCheckComboBox(QComboBox):
         return False
 
 
+    #========================================================================
     def shortcutEvent(self, Event):
         """Fonction de gestion des raccourcis clavier."""
         # S'il y a combinaison de ctrl + une des touches suivantes, on exécute la commande associée
-        if Event.modifiers() == Qt.ControlModifier and Event.key() in [Qt.Key_C, Qt.Key_Z, Qt.Key_Y, Qt.Key_A, Qt.Key_P, Qt.Key_U]:
+        if Event.modifiers() == Qt.ControlModifier and Event.key() in [Qt.Key_C, Qt.Key_Z, Qt.Key_Y, Qt.Key_A, Qt.Key_P, Qt.Key_U, Qt.Key_R]:
             if Event.key() == Qt.Key_C:
                 self.copyText()
 
@@ -451,9 +517,33 @@ class QCheckComboBox(QComboBox):
             elif Event.key() == Qt.Key_U:
                 self.setStateAll(Qt.Unchecked)
 
+            elif Event.key() == Qt.Key_R and (self.DefaultValues[Qt.Checked] or self.DefaultValues[Qt.PartiallyChecked]):
+                self.resetDefaultValues()
+
             return True
 
         return False
+
+
+    #========================================================================
+    def popupEvent(self):
+        """Fonction gérant l'affichage ou son contraire de la liste des propositions."""
+        # Si la popup est visible, on la case sinon on l'affiche
+        if self.closeOnLineEditClick:
+            self.hidePopup()
+
+        else:
+            self.showPopup()
+
+
+    #========================================================================
+    def menuEvent(self):
+        """Fonction gérant l'affichage de la liste des actions."""
+        if PySideVersion == 6:
+            self.contextMenu.exec(QCursor.pos())
+
+        else:
+            self.contextMenu.exec_(QCursor.pos())
 
 
     #========================================================================
@@ -501,7 +591,7 @@ class QCheckComboBox(QComboBox):
 
 
     #========================================================================
-    def addItem(self, text, data=None, state=None, icon=None):
+    def addItem(self, text, data=None, state=None, icon=None, default=True):
         """Fonction de création de l'item."""
         # Création de l'item de base avec son texte et ses flags
         item = QStandardItem()
@@ -532,6 +622,10 @@ class QCheckComboBox(QComboBox):
         # Ajout de l'item
         self.model().appendRow(item)
 
+        # Met à jour les valeurs par défaut
+        if self.DefaultValuesSave and default:
+            self.setDefaultValues(self.DefaultValuesSave)
+
 
     #========================================================================
     def addItems(self, Items):
@@ -556,8 +650,13 @@ class QCheckComboBox(QComboBox):
             if "icon" not in Item.keys():
                 Item["icon"] = None
 
+            if Item != Items[-1]:
+                Item["default"] = False
+            else:
+                Item["default"] = True
+
             # Création de la ligne
-            self.addItem(Item["text"], Item["data"], Item["state"], Item["icon"])
+            self.addItem(Item["text"], Item["data"], Item["state"], Item["icon"], Item["default"])
 
 
     #========================================================================
@@ -620,8 +719,8 @@ class QCheckComboBox(QComboBox):
         Indexes = []
 
         # Traite tous les items un à un
-        for Item in range(self.model().rowCount()):
-            Indexes.append(Item)
+        for Index in range(self.model().rowCount()):
+            Indexes.append(Index)
 
         # Traite les cases retournées
         if Indexes:
@@ -638,7 +737,10 @@ class QCheckComboBox(QComboBox):
         FirstItem.setData("", Qt.UserRole)
         FirstItem.setTextAlignment(Qt.AlignHCenter)
 
-        if Icon is not None:
+        if isinstance(Icon, QIcon):
+            FirstItem.setIcon(Icon)
+
+        elif isinstance(Icon, str):
             FirstItem.setIcon(Icon)
 
         # S'il y a déjà un titre, on l'efface
@@ -654,6 +756,80 @@ class QCheckComboBox(QComboBox):
 
         # Mise à jour de la variable indiquant qu'il y a un titre
         self.TitleExists = True
+
+
+    #========================================================================
+    def setDefaultValues(self, State, Values, ValueType="Text", MatchFlag=Qt.MatchExactly, **kwargs):
+        """Fonction prenant les valeurs par défaut."""
+        # Bloque la fonction s'il n'y a pas encore de choix, elle sera rappelée plus tard
+        if self.model().rowCount() == 0 or (self.model().rowCount() == 1 and self.TitleExists):
+            self.DefaultValuesSave = kwargs
+            return
+
+        # Si l'état n'existe pas, on arrête là
+        if State not in [Qt.Checked, Qt.PartiallyChecked]:
+            return
+
+        # Si le flag n'existe pas, on arrête là
+        if MatchFlag not in [Qt.MatchExactly, Qt.MatchFixedString, Qt.MatchContains, Qt.MatchStartsWith, Qt.MatchEndsWith, Qt.MatchCaseSensitive, Qt.MatchRegularExpression, Qt.MatchWildcard, Qt.MatchWrap, Qt.MatchRecursive]:
+            return
+
+        # Si Textes n'est pas une liste de data, on le change en liste
+        if not isinstance(Values, list):
+            if isinstance(Data, (str, int)):
+                Values = [Values]
+
+        # Traitement différent en fonction du type de données
+        if ValueType == "Text":
+            # Recherche des textes
+            for Value in Values:
+                if isinstance(Value, str):
+                    for Item in self.model().findItems(Value, MatchFlag):
+                        self.DefaultValues[State].append(Item)
+
+        elif ValueType == "Data":
+            # Recherche des data
+            for Index in range(self.model().rowCount()):
+                Row = Index.row()
+                Item = self.model().item(Row)
+                Data = Item.data(Qt.UserRole)
+
+                if Data in Values:
+                    self.DefaultValues[State].append(Item)
+
+        elif ValueType == "Index":
+            # Recherche des indexes
+            for Index in Values:
+                if isinstance(Value, int):
+                    # S'il y a un titre, on ajoute +1
+                    if self.TitleExists:
+                        Index += 1
+
+                    Row = Index.row()
+                    Item = self.model().item(Row)
+                    self.DefaultValues[State].append(Item)
+
+
+        # Déblocage de l'action
+        if self.DefaultValues[Qt.Checked] or self.DefaultValues[Qt.PartiallyChecked]:
+            self.updateLang()
+
+
+    #========================================================================
+    def resetDefaultValues(self):
+        """Fonction de remise en état des valeurs par défaut."""
+        if self.DefaultValues[Qt.Checked] or self.DefaultValues[Qt.PartiallyChecked]:
+            # Décoche tout
+            self.setStateAll(Qt.Unchecked)
+
+            # Coche les différentes cases
+            for State, Items in self.DefaultValues.items():
+                Indexes = []
+
+                for Item in Items:
+                    Indexes.append(Item.index().row())
+
+                self.setStateItem(State, Indexes)
 
 
     #========================================================================
