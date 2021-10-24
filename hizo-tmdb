@@ -6,7 +6,6 @@
 # revoir pour charger toutes les pages en même temps
 
 
-
 #############
 ## Modules ##
 #############
@@ -14,6 +13,7 @@
 from os import execl, popen
 from shutil import copyfileobj, which
 from time import sleep
+from unidecode import unidecode
 import sys
 import requests
 
@@ -29,35 +29,46 @@ try:
     PySideVersion = 6
 
 except:
-    PySideVersion = 2
-
     try:
-        # PySide2
-        from PySide2.QtGui import QIcon, QPixmap, QDesktopServices, QCursor, QPalette, QBrush, QColor, QTextCursor
+        # PyQt6
+        from PyQt6.QtGui import QIcon, QPixmap, QDesktopServices, QCursor, QPalette, QBrush, QColor, QTextCursor, QAction
 
-        from PySide2.QtWidgets import QApplication, QMessageBox, QPushButton, QFileDialog, QProgressBar, QDialog, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QLabel, QLineEdit, QGroupBox, QComboBox, QCheckBox, QSpinBox, QTextEdit, QSpacerItem, QSizePolicy, QSplitter, QTabWidget, QWidget, QMainWindow, QScrollArea, QFormLayout, QStatusBar, QProxyStyle, QStyle, QAction
+        from PyQt6.QtWidgets import QApplication, QMessageBox, QPushButton, QFileDialog, QProgressBar, QDialog, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QLabel, QLineEdit, QGroupBox, QComboBox, QCheckBox, QSpinBox, QTextEdit, QSpacerItem, QSizePolicy, QSplitter, QTabWidget, QWidget, QMainWindow, QScrollArea, QFormLayout, QStatusBar, QProxyStyle, QStyle
 
-        from PySide2.QtCore import QObject, Slot, Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool
+        from PyQt6.QtCore import QObject, pyqtSlot as Slot, pyqtSignal as Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool
+
+        PySideVersion = 6
 
     except:
+        PySideVersion = 2
+
         try:
-            # PyQt5
-            from PyQt5.QtGui import QIcon, QPixmap, QDesktopServices, QCursor, QPalette, QBrush, QColor, QTextCursor
+            # PySide2
+            from PySide2.QtGui import QIcon, QPixmap, QDesktopServices, QCursor, QPalette, QBrush, QColor, QTextCursor
 
-            from PyQt5.QtWidgets import QApplication, QMessageBox, QPushButton, QFileDialog, QProgressBar, QDialog, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QLabel, QLineEdit, QGroupBox, QComboBox, QCheckBox, QSpinBox, QTextEdit, QSpacerItem, QSizePolicy, QSplitter, QTabWidget, QWidget, QMainWindow, QScrollArea, QFormLayout, QStatusBar, QProxyStyle, QStyle, QAction
+            from PySide2.QtWidgets import QApplication, QMessageBox, QPushButton, QFileDialog, QProgressBar, QDialog, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QLabel, QLineEdit, QGroupBox, QComboBox, QCheckBox, QSpinBox, QTextEdit, QSpacerItem, QSizePolicy, QSplitter, QTabWidget, QWidget, QMainWindow, QScrollArea, QFormLayout, QStatusBar, QProxyStyle, QStyle, QAction
 
-            from PyQt5.QtCore import QObject, pyqtSlot as Slot, pyqtSignal as Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool
+            from PySide2.QtCore import QObject, Slot, Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool
 
         except:
-            print("Impossible to find PySide6 / PySide2 / PyQt5.<br>You need to install one of them !<br><br>PySide6: <b>pip3 install pyside6</b><br>PySide2: <b>sudo apt install python3-pyside2</b><br>PyQt5: <b>sudo apt install python3-pyqt5</b>")
+            try:
+                # PyQt5
+                from PyQt5.QtGui import QIcon, QPixmap, QDesktopServices, QCursor, QPalette, QBrush, QColor, QTextCursor
 
-            if which("kdialog"):
-                popen("""kdialog --error "Impossible to find PySide6 / PySide2 / PyQt5.<br>You need to install one of them:<br><br>PySide6: <b>pip3 install pyside6</b><br>PySide2: <b>sudo apt install python3-pyside2</b><br>PyQt5: <b>sudo apt install python3-pyqt5</b>" """)
+                from PyQt5.QtWidgets import QApplication, QMessageBox, QPushButton, QFileDialog, QProgressBar, QDialog, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QLabel, QLineEdit, QGroupBox, QComboBox, QCheckBox, QSpinBox, QTextEdit, QSpacerItem, QSizePolicy, QSplitter, QTabWidget, QWidget, QMainWindow, QScrollArea, QFormLayout, QStatusBar, QProxyStyle, QStyle, QAction
 
-            elif which("zenity"):
-                popen("""zenity --error --no-wrap --text "Impossible to find PySide6 / PySide2 / PyQt5.\nYou need to install one of them:\n\nPySide6: <b>pip3 install pyside6</b>\nPySide2: <b>sudo apt install python3-pyside2</b>\nPyQt5: <b>sudo apt install python3-pyqt5</b>" """)
+                from PyQt5.QtCore import QObject, pyqtSlot as Slot, pyqtSignal as Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool
 
-            exit()
+            except:
+                print("Impossible to find PySide6 / PyQt6 / PySide2 / PyQt5.<br>You need to install one of them !<br><br>PySide6: <b>pip3 install pyside6</b><br>PySide2: <b>sudo apt install python3-pyside2</b><br>PyQt5: <b>sudo apt install python3-pyqt5</b>")
+
+                if which("kdialog"):
+                    popen("""kdialog --error "Impossible to find PySide6 / PyQt6 / PySide2 / PyQt5.<br>You need to install one of them:<br><br>PySide6: <b>pip3 install pyside6</b><br>PySide2: <b>sudo apt install python3-pyside2</b><br>PyQt5: <b>sudo apt install python3-pyqt5</b>" """)
+
+                elif which("zenity"):
+                    popen("""zenity --error --no-wrap --text "Impossible to find PySide6 / PyQt6 / PySide2 / PyQt5.\nYou need to install one of them:\n\nPySide6: <b>pip3 install pyside6</b>\nPySide2: <b>sudo apt install python3-pyside2</b>\nPyQt5: <b>sudo apt install python3-pyqt5</b>" """)
+
+                exit()
 
 
 # Widgets customisés
@@ -215,9 +226,9 @@ class ThreadActions(QRunnable):
             # Liste des films regroupés si plusieurs pages
             AllMovies = []
 
-            # Nettoyage du nom
-            NameFinded = Name.lower()
-            NameFinded = NameFinded.replace("*", "")
+            # Nettoyage du nom et des accents
+            NameFinded = Name.lower().replace("*", "")
+            NameFinded = unidecode(NameFinded)
 
             # Langue du texte
             Language = "fr-FR" if Global["Language"] == "Français" else "en_US"
@@ -260,6 +271,7 @@ class ThreadActions(QRunnable):
 
                     # Nettoyage du nom
                     TitleFinded = Movie['title'].lower()
+                    TitleFinded = unidecode(TitleFinded)
 
                     # Si l'étoile est utilisée dans la recherche
                     if "*" in Name:
@@ -1403,7 +1415,7 @@ if __name__ == '__main__':
 
     # Création de l'application
     HizoTMDB = QApplication(args)
-    HizoTMDB.setApplicationVersion("1.0.0") # Version de l'application
+    HizoTMDB.setApplicationVersion("1.0.1 - 2021/10/24") # Version de l'application
     HizoTMDB.setApplicationName("HizoTMDB") # Nom de l'application
     HizoTMDB.setWindowIcon(QIcon.fromTheme("hizo-tmdb", QIcon("Ressources:hizo-tmdb.png"))) # Icône de l'application
 
