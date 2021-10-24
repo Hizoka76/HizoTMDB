@@ -6,6 +6,8 @@
 
 ![02](https://user-images.githubusercontent.com/48289933/138588207-f381af95-e5e2-4ea8-ad11-67b935b52601.png)
 
+Forum Ubuntu-fr : http://forum.ubuntu-fr.org/viewtopic.php?id=1508741
+
 ### Histoire :
 Après avoir créé un système d'affichage de vignettes de fichiers matroska (mkv), il me fallait trouver facilement des affiches de qualité pour les ajouter dans les conteneurs mkv.
 
