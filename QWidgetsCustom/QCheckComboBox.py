@@ -2,7 +2,7 @@
 
 # Basé sur : https://gis.stackexchange.com/questions/350148/qcombobox-multiple-selection-pyqt5
 
-# Version: 21-10-25.1
+# Version: 21-10-25.2
 
 # Old :
     # Mise à jour du texte du lineEdit lors d'un changement d'état d'une case à cochée
@@ -179,7 +179,6 @@ class QCheckComboBox(QComboBox):
             if isinstance(kwargs["DefaultValues"], dict):
                 for State, Items in kwargs["DefaultValues"].items():
                     self.setDefaultValues(State, Items, self.DefaultValuesCase)
-
 
         # Chargement des textes de base
         self.updateLang()
@@ -704,13 +703,13 @@ class QCheckComboBox(QComboBox):
                     # Mode avec prise en compte de la casse
                     if CaseSensitive:
                         if Value in (Item.data(Qt.UserRole), Item.text()):
-                            self.DefaultValues[State].append(Item)
+                            Indexes.append(Index)
                             break
 
                     # Mode sans prise en compte de la casse
                     else:
                         if Value.lower() in (Item.data(Qt.UserRole).lower(), Item.text().lower()):
-                            self.DefaultValues[State].append(Item)
+                            Indexes.append(Index)
                             break
 
 
@@ -818,6 +817,7 @@ class QCheckComboBox(QComboBox):
 
         # Déblocage de l'action
         if self.DefaultValues[Qt.Checked] or self.DefaultValues[Qt.PartiallyChecked]:
+            print("ici", self.DefaultValues)
             self.updateLang()
 
 
@@ -827,12 +827,13 @@ class QCheckComboBox(QComboBox):
         if self.DefaultValues[Qt.Checked] or self.DefaultValues[Qt.PartiallyChecked]:
             # Décoche tout
             self.setStateAll(Qt.Unchecked)
-
+            print("putain :", self.DefaultValues)
             # Coche les différentes cases
             for State, Items in self.DefaultValues.items():
                 Indexes = []
 
                 for Item in Items:
+                    print(State, Item.text())
                     if Item:
                         Indexes.append(Item.index().row())
 
