@@ -629,6 +629,7 @@ class WinHizoTMDB(QMainWindow):
 
         self.ImagesLanguagesWidget = QCheckComboBox(self.ConfigsBox)
         self.ImagesLanguagesWidget.addItems(LanguageList + [{"text": 'null - Aucune', "data": "null"}])
+        self.ImagesLanguagesWidget.setDefaultValues(Qt.Checked, ["fr", "en", "null", 0, "ak - Akan"])
         self.ImagesLanguagesWidget.setStateItems(Qt.Checked, Global['ImagesLanguages'])
         self.ImagesLanguagesWidget.currentTextChanged.connect(self.UpadeImagesLanguages)
         self.ImagesLanguagesWidget.setMinimumWidth(150)
@@ -1031,6 +1032,10 @@ class WinHizoTMDB(QMainWindow):
     #========================================================================
     def UpadeImagesLanguages(self, ImagesLanguagesUpdated):
         """Fonction de mise à jour des langues des affiches."""
+        # SI c'est le titre lors de la création, on le bloque
+        if ImagesLanguagesUpdated == translate("ConfigBox", "Languages available:"):
+            return
+
         # Si la sélection du dossier est OK
         if ImagesLanguagesUpdated:
             # Mise à jour de la variable
@@ -1415,7 +1420,7 @@ if __name__ == '__main__':
 
     # Création de l'application
     HizoTMDB = QApplication(args)
-    HizoTMDB.setApplicationVersion("1.0.1 - 2021/10/24") # Version de l'application
+    HizoTMDB.setApplicationVersion("21-10-25.0") # Version de l'application
     HizoTMDB.setApplicationName("HizoTMDB") # Nom de l'application
     HizoTMDB.setWindowIcon(QIcon.fromTheme("hizo-tmdb", QIcon("Ressources:hizo-tmdb.png"))) # Icône de l'application
 
@@ -1432,7 +1437,6 @@ if __name__ == '__main__':
     Global['StopThread'] = False
 
     Global['Token'] = Configs.value("hizo-tmdb/Token")
-    Global['ImagesLanguages'] = Configs.value("hizo-tmdb/ImagesLanguages", ["en", "fr", "null"])
     Global['ImageSize'] = int(Configs.value("hizo-tmdb/ImageSize", 200))
     Global['NbPage'] = int(Configs.value("hizo-tmdb/NbPage", 1))
     Global['WinWidth'] = int(Configs.value("hizo-tmdb/WinWidth", 650))
@@ -1441,6 +1445,11 @@ if __name__ == '__main__':
     Global['AutoDl'] = int(Configs.value("hizo-tmdb/AutoDl", 0))
     Global['AutoSearch'] = int(Configs.value("hizo-tmdb/AutoSearch", 1))
     Global['TryMax'] = int(Configs.value("hizo-tmdb/TryMax", 5))
+
+    # Langues des affiches
+    Global['ImagesLanguages'] = Configs.value("hizo-tmdb/ImagesLanguages", ["en", "fr", "null"])
+    if isinstance(Global['ImagesLanguages'], str):
+        Global['ImagesLanguages'] = Global['ImagesLanguages'].split(", ")
 
     # Pour ces valeurs, il faut que ce soit des int et non des str
     Global['WinSplitter'] = list(Configs.value("hizo-tmdb/WinSplitter", [0, 0]))
