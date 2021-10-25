@@ -2,50 +2,7 @@
 
 # Basé sur : https://gis.stackexchange.com/questions/350148/qcombobox-multiple-selection-pyqt5
 
-# tester setDefaultValues
-    # essayer d'envoyer des textes inconnus, des index innexistants
-    # essayé de l'utiliser avant items et item
-
-# Mettre à jour setStateItems pour utiliser du texte ou des indexs
-
-
-# Use:
-    # Widget = QCheckComboBox()
-        # Arguments possible:
-            # TristateMode: Activate the tristate checkbox (True/1)
-            # CopyIcon: Icon of the copy item in the context menu (QIcon/str)
-            # UndoIcon: Icon of the undo item in the context menu (QIcon/str)
-            # RedoIcon: Icon of the redo item in the context menu (QIcon/str)
-            # AllCheckIcon: Icon of the all check item in the context menu (QIcon/str)
-            # AllUncheckIcon: Icon of the all uncheck item in the context menu (QIcon/str)
-            # AllPatriallyCheckIcon: Icon of the all partially check item in the context menu (QIcon/str)
-            # DefaultValuesIcon: Icon of the restore default value item in the context menu (QIcon/str)
-            # Title: Add an itme at index 0 with this text, it's not editable (str)
-            # TitleIcon: Icon to add with the title (QIcon/str)
-            # Items: Items to inject into the ComboBox (List of dict like [{text:, data:, state:, icon:}])
-            # DefaultValues: Items with their state (State, Values, ValueType, MatchFlag)
-                # State: Checkbox state to attribute as Values
-                # Values: (list of) str or int of the items
-                # ValueType: To know the type of Values (Text, Data, Index) (Defaut: Text)
-                # MatchFlag: To the search of the texts (Defaut: Qt.MatchExactly)
-
-    # Fonctions of the class:
-        # setIcons: Icons of the items action
-        # setTristateMode: Activate the tristate mod
-        # updateLang:
-        # addItem: Add an Item into the ComboBox (text, data=None, state=None, icon=None, default=True)
-        # addItems: Add Items into the ComboBox (List of dict like [{text:, data:, state:, icon:}])
-        # setStateItems: Use a State for Items (CheckBox State, (list of) index)
-        # setStateAll: Use a State for all ChecBoox (CheckBox State)
-        # setTitle: Insert at start an item with Title and its Icon (Title:str, Icon:QIcon/str)
-        # setDefaultValues:
-        # resetDefaultValues: Reset all CheckBox with the DefaultValues
-        # setReUndoAction: Undo or Redo action (Action:"Undo"/"Redo")
-        # copyText: Copy into clipboard the current QLineEdit
-        # currentText: Return the current text of the QLineEdit
-        # currentData: Return the data of item selected
-
-
+# Version: 21-10-25.1
 
 # Old :
     # Mise à jour du texte du lineEdit lors d'un changement d'état d'une case à cochée
@@ -70,12 +27,6 @@
     # self.model() : QStandardItemModel
     # self.view() : QListView
     # self.view().viewport() : QWidget
-
-# Touches :
-    # Il est possible de se déplacer dans les éléments avec les flèches du clavier
-    # La touche espace modifie l'état de la case à cocher sans fermer la liste
-    # La touche entrée modifie l'état de la case à cocher en fermant la liste
-
 
 
 try:
@@ -151,6 +102,7 @@ class QCheckComboBox(QComboBox):
         self.TitleExists = False
 
         # Liste des valeurs par défaut
+        self.DefaultValuesCase = False
         self.DefaultValuesSave = None
         self.DefaultValues = {
             Qt.Checked: [],
@@ -196,6 +148,7 @@ class QCheckComboBox(QComboBox):
         if "TristateMode" in kwargs:
             self.setTristateMode(kwargs["TristateMode"])
 
+
         # Si des icônes sont passées lors de la création de la classe
         self.setIcons(
             Copy=kwargs.get("CopyIcon"),
@@ -216,11 +169,16 @@ class QCheckComboBox(QComboBox):
         if "Items" in kwargs:
             self.addItems(kwargs["Items"])
 
+        # Si le respect de la casse par défaut est précisée
+        if "DefaultValuesCase" in kwargs:
+            if isinstance(kwargs["DefaultValuesCase"], bool) or kwargs["DefaultValuesCase"] in [0, 1, "0", "1", "True", "False"]:
+                self.DefaultValuesCase = bool(kwargs["DefaultValuesCase"])
+
         # Si des valeurs par défaut ont été données
         if "DefaultValues" in kwargs:
             if isinstance(kwargs["DefaultValues"], dict):
                 for State, Items in kwargs["DefaultValues"].items():
-                    self.setDefaultValues(State, Items)
+                    self.setDefaultValues(State, Items, self.DefaultValuesCase)
 
 
         # Chargement des textes de base
@@ -230,11 +188,30 @@ class QCheckComboBox(QComboBox):
     #========================================================================
     def setIcons(self, **kwargs):
         """Fonction permettant de changer les icônes par défaut."""
-        for IconName in ["Copy", "Undo", "Redo", "AllCheck", "AllUncheck", "AllPatriallyCheck", "DefaultValues"]:
-            Icon = kwargs.get(IconName)
+        # Arguments acceptés, sert à ne pas prendre en compte la casse
+        ArgumentsOK = {
+            "copy": "Copy",
+            "undo": "Undo",
+            "redo": "Redo",
+            "allcheck": "AllCheck",
+            "alluncheck": "AllUncheck",
+            "allpatriallycheck": "AllPatriallyCheck",
+            "defaultvalues": "DefaultValues"
+            }
 
-            if Icon:
-                self.MenuIcons[IconName] = self.iconCreation(Icon)
+        # Arguments passés
+        FunctionArgs = {}
+        for Arg in kwargs.keys():
+            FunctionArgs[Arg.lower()] = Arg
+
+        # Boucle sur les arguments valides
+        for IconName in ArgumentsOK.keys():
+            # Si l'argument OK existe dans la liste de ceux rentrés
+            if IconName in FunctionArgs.keys():
+                Icon = kwargs.get(FunctionArgs[IconName])
+
+                if Icon:
+                    self.MenuIcons[ArgumentsOK[IconName]] = self.iconCreation(Icon)
 
 
     #========================================================================
@@ -622,9 +599,9 @@ class QCheckComboBox(QComboBox):
         # Ajout de l'item
         self.model().appendRow(item)
 
-        # Met à jour les valeurs par défaut
+        # Met à jour les valeurs par défaut, en utilisant le dictionnaire comme arguments
         if self.DefaultValuesSave and default:
-            self.setDefaultValues(self.DefaultValuesSave)
+            self.setDefaultValues(**self.DefaultValuesSave)
 
 
     #========================================================================
@@ -670,7 +647,8 @@ class QCheckComboBox(QComboBox):
 
         # Si Indexes n'est pas une liste, on la change
         if not isinstance(Indexes, list):
-            Indexes = [Indexes]
+            if isinstance(Indexes, (str, int)):
+                Indexes = [Indexes]
 
         # Permet de regrouper les actions quand elles ont lieu en même temps
         History = []
@@ -699,16 +677,44 @@ class QCheckComboBox(QComboBox):
 
 
     #========================================================================
-    def setStateItems(self, State, Items):
+    def setStateItems(self, State, Values, CaseSensitive=False):
         """Fonction de modification de l'état de la case à cocher en se basant sur sa data."""
         Indexes = []
 
-        # Ajoute les indexes des cases correspondantes
-        for Item in range(self.model().rowCount()):
-            if self.model().item(Item).data(Qt.UserRole) in Items:
-                Indexes.append(Item)
+        # Utilisation d'une liste obligatoire
+        if not isinstance(Values, list):
+            if isinstance(Values, (str, int)):
+                Values = [Values]
 
-        # Traite les cases retournées
+        # Traitement des valeurs
+        for Value in Values:
+            # Si la valeur est un  nombre, on le considère comme un index
+            if isinstance(Value, int):
+                if self.TitleExists:
+                    Indexes.append(Value + 1)
+
+                else:
+                    Indexes.append(Value)
+
+            # Si c'est un texte, on le recherche dans les data et les textes
+            elif isinstance(Value, str):
+                for Index in range(self.model().rowCount()):
+                    Item = self.model().item(Index)
+
+                    # Mode avec prise en compte de la casse
+                    if CaseSensitive:
+                        if Value in (Item.data(Qt.UserRole), Item.text()):
+                            self.DefaultValues[State].append(Item)
+                            break
+
+                    # Mode sans prise en compte de la casse
+                    else:
+                        if Value.lower() in (Item.data(Qt.UserRole).lower(), Item.text().lower()):
+                            self.DefaultValues[State].append(Item)
+                            break
+
+
+        # Traite les indexes retournés
         if Indexes:
             self.setStateItem(State, Indexes)
 
@@ -759,55 +765,55 @@ class QCheckComboBox(QComboBox):
 
 
     #========================================================================
-    def setDefaultValues(self, State, Values, ValueType="Text", MatchFlag=Qt.MatchExactly, **kwargs):
+    def setDefaultValues(self, State, Values, CaseSensitive=False):
         """Fonction prenant les valeurs par défaut."""
         # Bloque la fonction s'il n'y a pas encore de choix, elle sera rappelée plus tard
         if self.model().rowCount() == 0 or (self.model().rowCount() == 1 and self.TitleExists):
-            self.DefaultValuesSave = kwargs
+            self.DefaultValuesSave = {
+                "State": State,
+                "Values": Values,
+                "MatchFlag": MatchFlag
+                }
             return
 
         # Si l'état n'existe pas, on arrête là
         if State not in [Qt.Checked, Qt.PartiallyChecked]:
             return
 
-        # Si le flag n'existe pas, on arrête là
-        if MatchFlag not in [Qt.MatchExactly, Qt.MatchFixedString, Qt.MatchContains, Qt.MatchStartsWith, Qt.MatchEndsWith, Qt.MatchCaseSensitive, Qt.MatchRegularExpression, Qt.MatchWildcard, Qt.MatchWrap, Qt.MatchRecursive]:
-            return
-
         # Si Textes n'est pas une liste de data, on le change en liste
         if not isinstance(Values, list):
-            if isinstance(Data, (str, int)):
+            if isinstance(Values, (str, int)):
                 Values = [Values]
 
-        # Traitement différent en fonction du type de données
-        if ValueType == "Text":
-            # Recherche des textes
-            for Value in Values:
-                if isinstance(Value, str):
-                    for Item in self.model().findItems(Value, MatchFlag):
-                        self.DefaultValues[State].append(Item)
+        # Traitement des valeurs
+        for Value in Values:
+            # Si la valeur est un  nombre, on le considère comme un index
+            if isinstance(Value, int):
+                if self.TitleExists:
+                    Item = self.model().item(Value + 1)
 
-        elif ValueType == "Data":
-            # Recherche des data
-            for Index in range(self.model().rowCount()):
-                Row = Index.row()
-                Item = self.model().item(Row)
-                Data = Item.data(Qt.UserRole)
+                else:
+                    Item = self.model().item(Value)
 
-                if Data in Values:
+                if Item:
                     self.DefaultValues[State].append(Item)
 
-        elif ValueType == "Index":
-            # Recherche des indexes
-            for Index in Values:
-                if isinstance(Value, int):
-                    # S'il y a un titre, on ajoute +1
-                    if self.TitleExists:
-                        Index += 1
+            # Si c'est un texte, on le recherche dans les data et les textes
+            elif isinstance(Value, str):
+                for Index in range(self.model().rowCount()):
+                    Item = self.model().item(Index)
 
-                    Row = Index.row()
-                    Item = self.model().item(Row)
-                    self.DefaultValues[State].append(Item)
+                    # Mode avec prise en compte de la casse
+                    if CaseSensitive:
+                        if Value in (Item.data(Qt.UserRole), Item.text()):
+                            self.DefaultValues[State].append(Item)
+                            break
+
+                    # Mode sans prise en compte de la casse
+                    else:
+                        if Value.lower() in (Item.data(Qt.UserRole).lower(), Item.text().lower()):
+                            self.DefaultValues[State].append(Item)
+                            break
 
 
         # Déblocage de l'action
@@ -827,7 +833,8 @@ class QCheckComboBox(QComboBox):
                 Indexes = []
 
                 for Item in Items:
-                    Indexes.append(Item.index().row())
+                    if Item:
+                        Indexes.append(Item.index().row())
 
                 self.setStateItem(State, Indexes)
 
