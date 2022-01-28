@@ -64,7 +64,8 @@ Les possibilités de recherches sont :
  - Une recherche exacte : _Iron Man_
  - Une recherche de titres commençants par : _Iron *_
  - Une recherche de titres finissants par : _* Man_
- - Une recherche très approximative : _*man*_
+ - Une recherche très approximative : _\*man\*_
+
 La casse n'est pas prise en compte.
 
 *** ***
@@ -129,6 +130,7 @@ The search possibilities are:
  - An exact search : _Iron Man_
  - A search for titles beginning with : _Iron *_
  - A search for titles ending with : _* Man_
- - A very approximate search : _*man*_
+ - A very approximate search : _\*man\*_
+ - 
 Case is not taken into account.
 
