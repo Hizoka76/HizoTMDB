@@ -5,6 +5,9 @@
 
 # revoir pour charger toutes les pages en même temps
 
+# Teste le titre et le titre original
+
+# Mise à jour de QCheckComboBox
 
 #############
 ## Modules ##
@@ -269,23 +272,31 @@ class ThreadActions(QRunnable):
                     # Stoppe le travail si clic sur le bouton stop
                     if Global['StopThread']: return
 
-                    # Nettoyage du nom
-                    TitleFinded = Movie['title'].lower()
-                    TitleFinded = unidecode(TitleFinded)
+                    MovieOK = False
+                    for Title in ["title", "original_title"]:
+                        # Nettoyage du nom
+                        TitleFinded = Movie[Title].lower()
+                        TitleFinded = unidecode(TitleFinded)
 
-                    # Si l'étoile est utilisée dans la recherche
-                    if "*" in Name:
-                        # Si le nom est entouré, on le reprend
-                        if Name[0] != "*" or Name[-1] != "*":
-                            # Si le nom doit commencer par... (Iron*)
-                            if Name[-1] == "*" and not TitleFinded.startswith(NameFinded): continue
+                        # Si l'étoile est utilisée dans la recherche
+                        if "*" in Name:
+                            # Si le nom est entouré, on le reprend
+                            if Name[0] != "*" or Name[-1] != "*":
+                                # Si le nom doit commencer par... (Iron*)
+                                if Name[-1] == "*" and not TitleFinded.startswith(NameFinded): continue
 
-                            # Si le nom doit finir par... (Iron*)
-                            if Name[0] == "*" and not TitleFinded.endswith(NameFinded): continue
+                                # Si le nom doit finir par... (Iron*)
+                                if Name[0] == "*" and not TitleFinded.endswith(NameFinded): continue
 
-                    # Sinon, c'est qu'on veut le nom exacte
-                    else:
-                        if NameFinded != TitleFinded: continue
+                        # Sinon, c'est qu'on veut le nom exacte
+                        else:
+                            if NameFinded != TitleFinded: continue
+
+                        MovieOK = True
+                        break
+
+                    if not MovieOK:
+                        continue
 
                     # Ne traite pas les films sans poster
                     if 'poster_path' not in Movie.keys() or not Movie['poster_path']: continue
@@ -629,17 +640,25 @@ class WinHizoTMDB(QMainWindow):
 
         self.ImagesLanguagesWidget = QCheckComboBox(self.ConfigsBox)
         self.ImagesLanguagesWidget.addItems(LanguageList + [{"text": 'null - Aucune', "data": "null"}])
-        self.ImagesLanguagesWidget.setDefaultValues(Qt.Checked, ["fr", "en", "null", 0, "ak - Akan"])
-        self.ImagesLanguagesWidget.setStateItems(Qt.Checked, Global['ImagesLanguages'])
+        self.ImagesLanguagesWidget.setStateItems(Qt.Checked, Global['ImagesLanguages'], False, False)
         self.ImagesLanguagesWidget.currentTextChanged.connect(self.UpadeImagesLanguages)
         self.ImagesLanguagesWidget.setMinimumWidth(150)
-        self.ImagesLanguagesWidget.setIcons(
-            Copy=QIcon.fromTheme("edit-select-text", QIcon("Ressources:edit-select-text")),
-            Undo=QIcon.fromTheme("edit-undo", QIcon("Ressources:edit-undo")),
-            Redo=QIcon.fromTheme("edit-redo", QIcon("Ressources:edit-redo")),
-            AllCheck=QIcon.fromTheme("edit-select-all", QIcon("Ressources:edit-select-all")),
-            AllUncheck=QIcon.fromTheme("edit-select-none", QIcon("Ressources:edit-select-none"))
-            )
+
+        self.ImagesLanguagesWidget.setDefaultValues([
+            {"value": "fr", "state":Qt.Checked},
+            {"value": "en", "state":Qt.Checked},
+            {"value": "null", "state":Qt.Checked},
+            ])
+
+        self.ImagesLanguagesWidget.setIcons({
+            "Copy": QIcon.fromTheme("edit-select-text", QIcon("Ressources:edit-select-text")),
+            "Undo": QIcon.fromTheme("edit-undo", QIcon("Ressources:edit-undo")),
+            "Redo": QIcon.fromTheme("edit-redo", QIcon("Ressources:edit-redo")),
+            "AllCheck": QIcon.fromTheme("edit-select-all", QIcon("Ressources:edit-select-all")),
+            "AllUncheck": QIcon.fromTheme("edit-select-none", QIcon("Ressources:edit-select-none")),
+            "DefaultValues": QIcon.fromTheme("edit-reset", QIcon("Ressources:edit-reset"))
+            })
+
         self.ImagesLanguagesLabel = QLabel()
         ProgressFLayout.addRow(self.ImagesLanguagesLabel, self.ImagesLanguagesWidget)
 
@@ -708,6 +727,7 @@ class WinHizoTMDB(QMainWindow):
         self.MoviesFindedTab.setTabsClosable(True)
         self.MoviesFindedTab.tabCloseRequested.connect(self.RemoveMovieTab)
         MoviesFindedHLayout.addWidget(self.MoviesFindedTab)
+        self.MoviesFindedTab.installEventFilter(self)
 
 
         # Répartition du WinSplitter
@@ -753,6 +773,19 @@ class WinHizoTMDB(QMainWindow):
         # Lancement automatique de la recherche
         if Global['AutoSearch']:
             self.LaunchMovieSearch()
+
+
+    #========================================================================
+    def eventFilter(self, Object, Event):
+        """Filtre sur les événements."""
+        # Fermeture des onglets eu clic molette
+        if Object == self.MoviesFindedTab:
+            if Event.type() == QEvent.Type.MouseButtonRelease:
+                if Event.button() == Qt.MouseButton.MiddleButton:
+                    TabIndex = self.MoviesFindedTab.tabBar().tabAt(Event.position().toPoint())
+                    self.RemoveMovieTab(TabIndex)
+
+        return False
 
 
     #========================================================================
@@ -1032,17 +1065,17 @@ class WinHizoTMDB(QMainWindow):
     #========================================================================
     def UpadeImagesLanguages(self, ImagesLanguagesUpdated):
         """Fonction de mise à jour des langues des affiches."""
-        # SI c'est le titre lors de la création, on le bloque
+        # Si c'est le titre lors de la création, on le bloque
         if ImagesLanguagesUpdated == translate("ConfigBox", "Languages available:"):
             return
 
         # Si la sélection du dossier est OK
         if ImagesLanguagesUpdated:
             # Mise à jour de la variable
-            Global['ImagesLanguages'] = ImagesLanguagesUpdated.split(", ")
+            Global['ImagesLanguages'] = self.ImagesLanguagesWidget.currentData()
 
             # Sauvegarde de la valeur dans le fichier de config
-            Configs.setValue("hizo-tmdb/ImagesLanguages", ImagesLanguagesUpdated)
+            Configs.setValue("hizo-tmdb/ImagesLanguages", Global['ImagesLanguages'])
 
             # Remise en couleur normale
             self.ImagesLanguagesWidget.setPalette(self.ImagesLanguagesWidget.style().standardPalette())
@@ -1060,7 +1093,6 @@ class WinHizoTMDB(QMainWindow):
     #========================================================================
     def UpadeDownloadFolder(self, DownloadFolderUpdated):
         """Fonction de mise à jour du dossier de téléchargement."""
-        print("DownloadFolderUpdated", DownloadFolderUpdated)
         # Si la sélection du dossier est OK
         if DownloadFolderUpdated:
             # Mise à jour de la variable
@@ -1167,7 +1199,7 @@ class WinHizoTMDB(QMainWindow):
         self.ImagesLanguagesWidget.setStatusTip(translate("ConfigBox", "Mandatory: The posters' languages to download."))
         # Les icônes plantent PyQt5
         if PySideVersion == 6: self.ImagesLanguagesWidget.setTitle(translate("ConfigBox", "Languages available:"), QIcon.fromTheme("languages", QIcon("Ressources:edit-undo.svg")))
-        self.ImagesLanguagesWidget.updateLang()
+        self.ImagesLanguagesWidget.contextMenuUpdate()
         self.ImagesLanguagesWidget.updateText()
 
         # Widgets de la ReturnBox
@@ -1420,7 +1452,7 @@ if __name__ == '__main__':
 
     # Création de l'application
     HizoTMDB = QApplication(args)
-    HizoTMDB.setApplicationVersion("21-10-25.0") # Version de l'application
+    HizoTMDB.setApplicationVersion("22-06-14.0") # Version de l'application
     HizoTMDB.setApplicationName("HizoTMDB") # Nom de l'application
     HizoTMDB.setWindowIcon(QIcon.fromTheme("hizo-tmdb", QIcon("Ressources:hizo-tmdb.png"))) # Icône de l'application
 
@@ -1492,12 +1524,6 @@ if __name__ == '__main__':
     brush = QBrush(QColor(255, 255, 125))
     brush.setStyle(Qt.SolidPattern)
     PalettesWigets["LineEdit"].setBrush(QPalette.Active, QPalette.Base, brush)
-    brush = QBrush(QColor(0, 0, 0))
-    brush.setStyle(Qt.SolidPattern)
-    PalettesWigets["LineEdit"].setBrush(QPalette.Active, QPalette.ToolTipText, brush)
-    brush = QBrush(QColor(255, 255, 255))
-    brush.setStyle(Qt.SolidPattern)
-    PalettesWigets["LineEdit"].setBrush(QPalette.Active, QPalette.ToolTipBase, brush)
 
 
     ### Permet d'éviter les fameux Erreur de segmentation (core dumped)
