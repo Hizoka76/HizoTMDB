@@ -74,7 +74,7 @@ except:
                 exit()
 
 
-# Widgets customisés
+# Widgets personnalisés
 from QWidgetsCustom.QCheckComboBox import QCheckComboBox
 from QWidgetsCustom.QToolButtonCustom import QToolButtonCustom
 from QWidgetsCustom.QPushQuitButton import QPushQuitButton
@@ -727,8 +727,6 @@ class WinHizoTMDB(QMainWindow):
         self.MoviesFindedTab.setTabsClosable(True)
         self.MoviesFindedTab.tabCloseRequested.connect(self.RemoveMovieTab)
         MoviesFindedHLayout.addWidget(self.MoviesFindedTab)
-        self.MoviesFindedTab.installEventFilter(self)
-
 
         # Répartition du WinSplitter
         if Global['WinSplitter'] == [0, 0]:
@@ -752,6 +750,10 @@ class WinHizoTMDB(QMainWindow):
         else:
             self.TopSplitter.setSizes(Global['TopSplitter'])
 
+
+        # Installation des filtres des événements
+        self.MoviesFindedTab.installEventFilter(self)
+        self.MoviesSearchedTextEdit.installEventFilter(self)
 
         # Chargement de la langues, force l'anglais
         if Global["Language"] == "Français": self.LanguageWidget.setCurrentText("Français")
@@ -784,6 +786,14 @@ class WinHizoTMDB(QMainWindow):
                 if Event.button() == Qt.MouseButton.MiddleButton:
                     TabIndex = self.MoviesFindedTab.tabBar().tabAt(Event.position().toPoint())
                     self.RemoveMovieTab(TabIndex)
+
+        # Lors de l'utilisation de ctrl + entrée dans QTextEdit des noms de films
+        elif Object == self.MoviesSearchedTextEdit:
+            if Event.type() == QEvent.Type.KeyRelease:
+                if Event.modifiers() == Qt.ControlModifier:
+                    # Il semble que la touche entrée du pavé numérique ne se cumule pas avec ctrl
+                    if Event.key() in [Qt.Key_Enter, Qt.Key_Return]:
+                        self.MoviesSearchedButton.click()
 
         return False
 
@@ -1156,7 +1166,7 @@ class WinHizoTMDB(QMainWindow):
         self.MoviesSearchedButton.setText(translate("SearchBox", "Start search"))
         self.MoviesSearchedBox.setTitle(translate("SearchBox", "Movie names searched:"))
         self.MoviesSearchedButton.setStatusTip(translate("SearchBox", "Start the movies searching."))
-        self.MoviesSearchedLabel.setToolTip(translate("SearchBox", "Movie's names to search on <b>The Movie Data Base</b>.<br><br>Rules:<br> - Only one search per line.<br> - Exact names (not case sensitive).<br> - Use *'s for extended search.<br> - Name must be completed enough to be found. <br><br>Examples:<br> - Iron Man: Will return movies with the name iron man.<br> - Iron*: Will return all movies whose name starts with iron.<br> - *Man: Will return all movies whose name ends with man.<br> - *Man*: Will return all movies whose name includes man."))
+        self.MoviesSearchedLabel.setToolTip(translate("SearchBox", "Movie's names to search on <b>The Movie Data Base</b>.<br><br>Rules:<br> - Only one search per line.<br> - Exact names (not case sensitive).<br> - Use *'s for extended search.<br> - Name must be completed enough to be found. <br><br>Examples:<br> - Iron Man: Will return movies with the name iron man.<br> - Iron*: Will return all movies whose name starts with iron.<br> - *Man: Will return all movies whose name ends with man.<br> - *Man*: Will return all movies whose name includes man.<br><br>ctrl + enter launches the search."))
 
         # Widgets de la ProgressBox
         self.ProgressButton.setStatusTip(translate("ProgressBox", "Stop the work in progress..."))
@@ -1452,7 +1462,7 @@ if __name__ == '__main__':
 
     # Création de l'application
     HizoTMDB = QApplication(args)
-    HizoTMDB.setApplicationVersion("22-06-14.0") # Version de l'application
+    HizoTMDB.setApplicationVersion("22-06-15.0") # Version de l'application
     HizoTMDB.setApplicationName("HizoTMDB") # Nom de l'application
     HizoTMDB.setWindowIcon(QIcon.fromTheme("hizo-tmdb", QIcon("Ressources:hizo-tmdb.png"))) # Icône de l'application
 
