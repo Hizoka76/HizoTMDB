@@ -5,20 +5,47 @@
 
 # revoir pour charger toutes les pages en même temps
 
-# Teste le titre et le titre original
 
-# Mise à jour de QCheckComboBox
+###############################
+### Importation des modules ###
+###############################
+try:
+    import sys
+except:
+    exit("Error: Impossible to find the sys module !")
 
-#############
-## Modules ##
-#############
-# Modules Python
-from os import execl, popen
-from shutil import copyfileobj, which
-from time import sleep
-from unidecode import unidecode
-import sys
-import requests
+# Pour le reboot, facultatif
+try:
+    from os import execl, popen
+except:
+    print("Warning: Impossible to find execl/popen from the os module ! Impossible to reboot with the right click on exit button.")
+    pass
+
+try:
+    import requests
+except:
+    exit("Warning: Impossible to find the requests module !")
+
+try:
+    import sys
+except:
+    exit("Warning: Impossible to find the sys module !")
+
+try:
+    from shutil import copyfileobj, which
+except:
+    exit("Warning: Impossible to find copyfileobj/which from the shutil module !")
+
+try:
+    from time import sleep
+except:
+    exit("Warning: Impossible to find sleep from the time module !")
+
+# Sert à virer les accents pour les recherches
+try:
+    from unidecode import unidecode
+except:
+    exit("Warning: Impossible to find unidecode from the time unidecode !")
 
 
 try:
@@ -27,7 +54,7 @@ try:
 
     from PySide6.QtWidgets import QApplication, QMessageBox, QPushButton, QFileDialog, QProgressBar, QDialog, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QLabel, QLineEdit, QGroupBox, QComboBox, QCheckBox, QSpinBox, QTextEdit, QSpacerItem, QSizePolicy, QSplitter, QTabWidget, QWidget, QMainWindow, QScrollArea, QFormLayout, QStatusBar, QProxyStyle, QStyle
 
-    from PySide6.QtCore import QObject, Slot, Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool
+    from PySide6.QtCore import QObject, Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool, QStandardPaths, QFile
 
     PySideVersion = 6
 
@@ -38,7 +65,7 @@ except:
 
         from PyQt6.QtWidgets import QApplication, QMessageBox, QPushButton, QFileDialog, QProgressBar, QDialog, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QLabel, QLineEdit, QGroupBox, QComboBox, QCheckBox, QSpinBox, QTextEdit, QSpacerItem, QSizePolicy, QSplitter, QTabWidget, QWidget, QMainWindow, QScrollArea, QFormLayout, QStatusBar, QProxyStyle, QStyle
 
-        from PyQt6.QtCore import QObject, pyqtSlot as Slot, pyqtSignal as Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool
+        from PyQt6.QtCore import QObject, pyqtSignal as Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool, QStandardPaths, QFile
 
         PySideVersion = 6
 
@@ -51,7 +78,7 @@ except:
 
             from PySide2.QtWidgets import QApplication, QMessageBox, QPushButton, QFileDialog, QProgressBar, QDialog, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QLabel, QLineEdit, QGroupBox, QComboBox, QCheckBox, QSpinBox, QTextEdit, QSpacerItem, QSizePolicy, QSplitter, QTabWidget, QWidget, QMainWindow, QScrollArea, QFormLayout, QStatusBar, QProxyStyle, QStyle, QAction
 
-            from PySide2.QtCore import QObject, Slot, Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool
+            from PySide2.QtCore import QObject, Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool, QStandardPaths, QFile
 
         except:
             try:
@@ -60,7 +87,7 @@ except:
 
                 from PyQt5.QtWidgets import QApplication, QMessageBox, QPushButton, QFileDialog, QProgressBar, QDialog, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QLabel, QLineEdit, QGroupBox, QComboBox, QCheckBox, QSpinBox, QTextEdit, QSpacerItem, QSizePolicy, QSplitter, QTabWidget, QWidget, QMainWindow, QScrollArea, QFormLayout, QStatusBar, QProxyStyle, QStyle, QAction
 
-                from PyQt5.QtCore import QObject, pyqtSlot as Slot, pyqtSignal as Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool
+                from PyQt5.QtCore import QObject, pyqtSignal as Signal, QTranslator, QCoreApplication, QEvent, Qt, QLocale, QTemporaryDir, QDir, QUrl, QSize, QSettings, QFileInfo, QRunnable, QThreadPool, QStandardPaths, QFile
 
             except:
                 print("Impossible to find PySide6 / PyQt6 / PySide2 / PyQt5.<br>You need to install one of them !<br><br>PySide6: <b>pip3 install pyside6</b><br>PySide2: <b>sudo apt install python3-pyside2</b><br>PyQt5: <b>sudo apt install python3-pyqt5</b>")
@@ -96,10 +123,10 @@ translate = QCoreApplication.translate
 class MyProxyStyle(QProxyStyle):
     def styleHint(self, hint, option = None, widget = None, returnData = None):
         # On peut ajouter des conditions de fonctionnement sur certains widgets uniquement
-        if hint == QStyle.SH_ToolTip_WakeUpDelay: return 0
+        if hint == QStyle.SH_ToolTip_WakeUpDelay:
+            return 0
 
-        return QProxyStyle().styleHint(hint, option, widget, returnData);
-
+        return QProxyStyle().styleHint(hint, option, widget, returnData)
 
 
 
@@ -182,17 +209,29 @@ class ThreadActions(QRunnable):
             self.URLBase = kwargs['URLBase']
             self.Name = kwargs['Name']
 
-            if 'Data' in kwargs.keys() and kwargs['Data']: self.Data = kwargs['Data']
-            else: self.Data = None
+            if 'Data' in kwargs.keys() and kwargs['Data']:
+                self.Data = kwargs['Data']
 
-            if 'Search' in kwargs.keys() and kwargs['Search']: self.Search = kwargs['Search']
-            else: self.Search = None
+            else:
+                self.Data = None
 
-            if 'Index' in kwargs.keys() and kwargs['Index']: self.Index = kwargs['Index']
-            else: self.Index = None
+            if 'Search' in kwargs.keys() and kwargs['Search']:
+                self.Search = kwargs['Search']
 
-            if 'NbMovie' in kwargs.keys() and kwargs['NbMovie']: self.NbMovie = kwargs['NbMovie']
-            else: self.NbMovie = 0
+            else:
+                self.Search = None
+
+            if 'Index' in kwargs.keys() and kwargs['Index']:
+                self.Index = kwargs['Index']
+
+            else:
+                self.Index = None
+
+            if 'NbMovie' in kwargs.keys() and kwargs['NbMovie']:
+                self.NbMovie = kwargs['NbMovie']
+
+            else:
+                self.NbMovie = 0
 
 
         ### Headers pour les requêtes
@@ -222,6 +261,11 @@ class ThreadActions(QRunnable):
     #========================================================================
     ### Fonction de recherche des films
     def Movies(self):
+        if Global['IncludeAdultSearch']:
+            IncludeAdult = "true"
+        else:
+            IncludeAdult = "false"
+
         # Recherche des films 1 à 1
         for Name in self.Names:
             self.Signals.Info.emit(GlobalTr["SearchStarts"].format(GlobalTr["InfoBlue"], Name))
@@ -234,7 +278,11 @@ class ThreadActions(QRunnable):
             NameFinded = unidecode(NameFinded)
 
             # Langue du texte
-            Language = "fr-FR" if Global["Language"] == "Français" else "en_US"
+            Language = "en_US"
+            if Global["Language"] == "Français":
+                Language = "fr-FR"
+
+            # Language = "fr-FR" if Global["Language"] == "Français" else "en_US"
 
             # Nombre de page à télécharger
             for Page in range(1, Global["NbPage"] + 1):
@@ -243,17 +291,17 @@ class ThreadActions(QRunnable):
 
                 self.Signals.Info.emit(GlobalTr["ReadingPage"].format(GlobalTr["InfoBlue"], Page))
 
-                Try = 0
-                while True:
-                    # Nombre de tentative
-                    Try += 1
-                    if Try > Global['TryMax']:
+                # Boucle au maximum au nombre de tentative
+                for Try in range(Global['TryMax'] + 1):
+                    # Si le nombre de tentative a été atteint, arrêt complet de la recherche
+                    if Try == Global['TryMax']:
+                        self.MaxTryReached = True
                         self.Signals.Info.emit("{} {} {}".format(GlobalTr["Error"], GlobalTr['ErrorMovies'], GlobalTr['TryMax']))
-                        break
+                        return
 
                     # Envoi de la requête à l'API de TMDB
                     try:
-                        Requete = requests.get("https://api.themoviedb.org/4/search/movie?language={}&query={}&page={}".format(Language, NameFinded.replace(" ", "%20"), Page), headers=self.Headers, timeout=self.TimeOut)
+                        Requete = requests.get("https://api.themoviedb.org/3/search/movie?language={}&query={}&page={}&include_adult={}".format(Language, NameFinded.replace(" ", "%20"), Page, IncludeAdult), headers=self.Headers, timeout=self.TimeOut)
 
                     # En cas d'échec de connexion, on relance la fonction
                     except:
@@ -267,12 +315,17 @@ class ThreadActions(QRunnable):
 
                     break
 
+
                 # Remplissage de la liste des films retournés
                 for Movie in Requete.json()['results']:
                     # Stoppe le travail si clic sur le bouton stop
                     if Global['StopThread']: return
 
                     MovieOK = False
+                    # Si on ne veut que des films adultes
+                    if Global['IncludeAdultSearch'] == 2:
+                        if not Movie["adult"]: continue
+
                     for Title in ["title", "original_title"]:
                         # Nettoyage du nom
                         TitleFinded = Movie[Title].lower()
@@ -295,6 +348,7 @@ class ThreadActions(QRunnable):
                         MovieOK = True
                         break
 
+
                     if not MovieOK:
                         continue
 
@@ -312,12 +366,6 @@ class ThreadActions(QRunnable):
 
             # Nombre de film renvoyé
             NbMovie = len(AllMovies)
-
-            # Si aucun film n'a été renvoyé
-            if not NbMovie:
-                self.Signals.Info.emit(GlobalTr["NoMovieReturns"].format(GlobalTr["InfoOrange"], Name))
-                self.Signals.ProgressPlus.emit()
-                continue
 
             # Signal de création
             self.Signals.AddTab.emit(Name, NbMovie)
@@ -492,10 +540,50 @@ class ThreadActions(QRunnable):
 
 
 #############################################################################
+class QScrollAreaCustom(QScrollArea):
+    """Sous classement d'un QScrollAreaCustom pour y modifier capturer la molette de la souris."""
+
+    ### Création du signal de changement de taille qui sera capté par les QScrollAreaCustom
+    signalButtonsResize = Signal(int)
+
+    #========================================================================
+    def __init__(self, Parent=None):
+        super().__init__(Parent)
+
+
+    #========================================================================
+    def wheelEvent(self, Event):
+        # Si le combo ctrl + molette est utilisé
+        if Event.modifiers() == Qt.ControlModifier and Event.angleDelta().y():
+            # Si la molette monte, on ajoute +10px à la taille des boutons
+            if Event.angleDelta().y() > 0:
+                self.signalButtonsResize.emit(10)
+
+            # Si la molette monte, on diminue de 10px la taille des boutons
+            else:
+                self.signalButtonsResize.emit(-10)
+
+        # Si le combo shift + molette est utilisé
+        elif Event.modifiers() == Qt.ShiftModifier and Event.angleDelta().y():
+            ScrollBar = self.verticalScrollBar()
+
+            # Si la molette monte, on monte tout en haut
+            if Event.angleDelta().y() > 0:
+                ScrollBar.setValue(ScrollBar.minimum())
+
+            # Si la molette monte, on descend tout en bas
+            else:
+                ScrollBar.setValue(ScrollBar.maximum())
+
+        # Si pas de combo ctrl + molette, on laisse passer l'événement
+        else:
+            super().wheelEvent(Event)
+
+
+
+#############################################################################
 class WinHizoTMDB(QMainWindow):
     """Fenêtre de configuration du code."""
-    ThreadStop = Signal()
-
     def __init__(self, Parent=None):
         super().__init__(Parent)
 
@@ -591,7 +679,6 @@ class WinHizoTMDB(QMainWindow):
         self.ProgressTextEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.ProgressTextEdit.setTextInteractionFlags(Qt.TextSelectableByKeyboard|Qt.TextSelectableByMouse)
         ProgressVLayout.addWidget(self.ProgressTextEdit)
-
 
         # Barre de progression
         ProgressHLayout = QHBoxLayout(None)
@@ -690,6 +777,13 @@ class WinHizoTMDB(QMainWindow):
         self.TryMaxLabel = QLabel()
         ProgressFLayout.addRow(self.TryMaxLabel, self.TryMaxWidget)
 
+        self.IncludeAdultSearchWidget = QCheckBox(self.ConfigsBox)
+        self.IncludeAdultSearchWidget.setTristate(True)
+        self.IncludeAdultSearchWidget.setChecked(Global['IncludeAdultSearch'])
+        self.IncludeAdultSearchWidget.stateChanged.connect(self.UpdateIncludeAdultSearch)
+        self.IncludeAdultSearchLabel = QLabel()
+        ProgressFLayout.addRow(self.IncludeAdultSearchLabel, self.IncludeAdultSearchWidget)
+
         self.AutoOpenDownloadFolderWidget = QCheckBox(self.ConfigsBox)
         self.AutoOpenDownloadFolderWidget.setChecked(Global['AutoOpenDownloadFolder'])
         self.AutoOpenDownloadFolderWidget.stateChanged.connect(self.UpdateAutoOpenDownloadFolder)
@@ -731,9 +825,13 @@ class WinHizoTMDB(QMainWindow):
         # Répartition du WinSplitter
         if Global['WinSplitter'] == [0, 0]:
             # 25% pour le TopSplitter dans la limite de 300px
-            SubWinSplitter1 = (self.width() * 25) / 100
-            if SubWinSplitter1 > 300: SubWinSplitter1 = 300
-            SubWinSplitter2 = self.width() - SubWinSplitter1
+            SubWinSplitter1 = int((self.width() * 25) / 100)
+
+            if SubWinSplitter1 > 300:
+                SubWinSplitter1 = 300
+
+            SubWinSplitter2 = int(self.width() - SubWinSplitter1)
+
             self.WinSplitter.setSizes([SubWinSplitter1, SubWinSplitter2])
 
         else:
@@ -742,9 +840,12 @@ class WinHizoTMDB(QMainWindow):
         # Répartition du TopSplitter
         if Global['TopSplitter'] == [0, 0]:
             #45% pour le MoviesSearchedBox dans la limite de 400px
-            SubTopSplitter1 = (self.width() * 45) / 100
-            if SubTopSplitter1 > 400: SubTopSplitter1 = 400
-            SubTopSplitter2 = self.width() - SubTopSplitter1
+            SubTopSplitter1 = int((self.width() * 45) / 100)
+
+            if SubTopSplitter1 > 400:
+                SubTopSplitter1 = 400
+
+            SubTopSplitter2 = int(self.width() - SubTopSplitter1)
             self.TopSplitter.setSizes([SubTopSplitter1, SubTopSplitter2])
 
         else:
@@ -756,18 +857,22 @@ class WinHizoTMDB(QMainWindow):
         self.MoviesSearchedTextEdit.installEventFilter(self)
 
         # Chargement de la langues, force l'anglais
-        if Global["Language"] == "Français": self.LanguageWidget.setCurrentText("Français")
-        else: self.UpdateLanguage("English")
+        if Global["Language"] == "Français":
+            self.LanguageWidget.setCurrentText("Français")
+
+        else:
+            self.UpdateLanguage("English")
 
 
         # Si des arguments ont été reçus
-        if len(sys.argv) > 1: self.MovieNamesCleaner(sys.argv[1:])
+        if len(sys.argv) > 1:
+            self.MovieNamesCleaner(sys.argv[1:])
 
         # Affichage de la fenêtre
         self.show()
 
         # Mise à jour du texte avec ...
-        #self.ImagesLanguagesWidget.updateText()
+        self.ImagesLanguagesWidget.updateText()
 
         ## Débloque ou non les actions si les variables sont OK
         self.UnlockActions()
@@ -883,8 +988,9 @@ class WinHizoTMDB(QMainWindow):
         self.MoviesTab[MovieName]['QWidget1'] = QWidget(None)
         self.MoviesTab[MovieName]['QHBoxLayout1'] = QHBoxLayout(self.MoviesTab[MovieName]['QWidget1'])
 
-        self.MoviesTab[MovieName]['QScrollArea'] = QScrollArea(self.MoviesTab[MovieName]['QWidget1'])
+        self.MoviesTab[MovieName]['QScrollArea'] = QScrollAreaCustom(self.MoviesTab[MovieName]['QWidget1'])
         self.MoviesTab[MovieName]['QScrollArea'].setWidgetResizable(True)
+        self.MoviesTab[MovieName]['QScrollArea'].signalButtonsResize.connect(self.UpadeImageSizeWheel)
         self.MoviesTab[MovieName]['QHBoxLayout1'].addWidget(self.MoviesTab[MovieName]['QScrollArea'])
 
         self.MoviesTab[MovieName]['QWidget2'] = QWidget(self.MoviesTab[MovieName]['QScrollArea'])
@@ -956,7 +1062,8 @@ class WinHizoTMDB(QMainWindow):
         self.WorkInProgress()
 
         # Recrée le dossier si besoin
-        if not Global['TempFolder'].exists(): QDir().mkpath(Global['TempFolder'].absolutePath())
+        if not Global['TempFolder'].exists():
+            QDir().mkpath(Global['TempFolder'].absolutePath())
 
         # Création et exécution du thread
         Work = ThreadActions(Action = "MoviePictures", Id = Widget.id, Name = Widget.title, DownloadFolder = Widget.DownloadFolder)
@@ -982,7 +1089,17 @@ class WinHizoTMDB(QMainWindow):
         Global['AutoDl'] = AutoDlWidgetUpdated
 
         # Sauvegarde de la valeur dans le fichier de config
-        Configs.setValue("hizo-tmdb/AutoDl", AutoDlWidgetUpdated)
+        Configs.setValue("AutoDl", AutoDlWidgetUpdated)
+
+
+    #========================================================================
+    def UpdateIncludeAdultSearch(self, IncludeAdultSearchUpdated):
+        """Fonction de mise à jour de l'option d'ouverture automatique des dossiers en fin de téléchargement."""
+        # Mise à jour de la variable
+        Global['IncludeAdultSearch'] = IncludeAdultSearchUpdated
+
+        # Sauvegarde de la valeur dans le fichier de config
+        Configs.setValue("IncludeAdultSearch", IncludeAdultSearchUpdated)
 
 
     #========================================================================
@@ -992,7 +1109,7 @@ class WinHizoTMDB(QMainWindow):
         Global['AutoOpenDownloadFolder'] = AutoOpenDownloadFolderUpdated
 
         # Sauvegarde de la valeur dans le fichier de config
-        Configs.setValue("hizo-tmdb/AutoOpenDownloadFolder", AutoOpenDownloadFolderUpdated)
+        Configs.setValue("AutoOpenDownloadFolder", AutoOpenDownloadFolderUpdated)
 
 
     #========================================================================
@@ -1002,7 +1119,14 @@ class WinHizoTMDB(QMainWindow):
         Global['AutoSearch'] = AutoSearchWidgetUpdated
 
         # Sauvegarde de la valeur dans le fichier de config
-        Configs.setValue("hizo-tmdb/AutoSearch", AutoSearchWidgetUpdated)
+        Configs.setValue("AutoSearch", AutoSearchWidgetUpdated)
+
+
+    #========================================================================
+    def UpadeImageSizeWheel(self, Value):
+        """Fonction appelée lors des combo ctl + molette sur les QScrollAreaCustom."""
+        # Mise à jour de la valeur de la taille des boutons, ce qui va executer UpadeImageSize
+        self.ImageSizeWidget.setValue(self.ImageSizeWidget.value() + Value)
 
 
     #========================================================================
@@ -1012,7 +1136,7 @@ class WinHizoTMDB(QMainWindow):
         Global['ImageSize'] = ImageSizeUpdated
 
         # Sauvegarde de la valeur dans le fichier de config
-        Configs.setValue("hizo-tmdb/ImageSize", ImageSizeUpdated)
+        Configs.setValue("ImageSize", ImageSizeUpdated)
 
         ## Mise à jour de la taille mini
         #self.MoviesFindedTab.setMinimumHeight(Global['ImageSize'] + 160)
@@ -1036,7 +1160,7 @@ class WinHizoTMDB(QMainWindow):
         Global['NbPage'] = NbPageUpdated
 
         # Sauvegarde de la valeur dans le fichier de config
-        Configs.setValue("hizo-tmdb/NbPage", NbPageUpdated)
+        Configs.setValue("NbPage", NbPageUpdated)
 
 
     #========================================================================
@@ -1046,7 +1170,7 @@ class WinHizoTMDB(QMainWindow):
         Global['TryMax'] = TryMaxUpdated
 
         # Sauvegarde de la valeur dans le fichier de config
-        Configs.setValue("hizo-tmdb/TryMax", TryMaxUpdated)
+        Configs.setValue("TryMax", TryMaxUpdated)
 
 
     #========================================================================
@@ -1057,7 +1181,7 @@ class WinHizoTMDB(QMainWindow):
             Global['Token'] = TokenUpdated
 
             # Sauvegarde de la valeur dans le fichier de config
-            Configs.setValue("hizo-tmdb/Token", TokenUpdated)
+            Configs.setValue("Token", TokenUpdated)
 
             # Remise en couleur normale
             self.TokenWidget.setPalette(self.TokenWidget.style().standardPalette())
@@ -1085,7 +1209,7 @@ class WinHizoTMDB(QMainWindow):
             Global['ImagesLanguages'] = self.ImagesLanguagesWidget.currentData()
 
             # Sauvegarde de la valeur dans le fichier de config
-            Configs.setValue("hizo-tmdb/ImagesLanguages", Global['ImagesLanguages'])
+            Configs.setValue("ImagesLanguages", Global['ImagesLanguages'])
 
             # Remise en couleur normale
             self.ImagesLanguagesWidget.setPalette(self.ImagesLanguagesWidget.style().standardPalette())
@@ -1109,7 +1233,7 @@ class WinHizoTMDB(QMainWindow):
             Global['DownloadFolder'] = QDir(DownloadFolderUpdated)
 
             # Sauvegarde de la valeur dans le fichier de config
-            Configs.setValue("hizo-tmdb/DownloadFolder", DownloadFolderUpdated)
+            Configs.setValue("DownloadFolder", DownloadFolderUpdated)
 
             # Remise en couleur normale
             self.DownloadFolderWidget.setPalette(self.DownloadFolderWidget.style().standardPalette())
@@ -1151,7 +1275,7 @@ class WinHizoTMDB(QMainWindow):
         Global["Language"] = "Français" if Value in (1, "Français") else "English"
 
         # Sauvegarde de la valeur dans le fichier de config
-        Configs.setValue("hizo-tmdb/Language", Value)
+        Configs.setValue("Language", Value)
 
 
         # Le changement de langue exécute l'événement changeEvent
@@ -1193,6 +1317,9 @@ class WinHizoTMDB(QMainWindow):
         self.ImageSizeLabel.setText(translate("ConfigBox", "Thumb Size:"))
         self.ImageSizeWidget.setStatusTip(translate("ConfigBox", "The size of the thumbnails' movie. Between 50px and 500px."))
 
+        self.IncludeAdultSearchLabel.setText(translate("ConfigBox", "Include Adult Search:"))
+        self.IncludeAdultSearchWidget.setStatusTip(translate("ConfigBox", "Enable (unchecked)/disable (half checked)/only (checked) adult content in the movie search."))
+
         self.AutoOpenDownloadFolderLabel.setText(translate("ConfigBox", "Auto Open Folder:"))
         self.AutoOpenDownloadFolderWidget.setStatusTip(translate("ConfigBox", "Enable/disable the auto open download folder when posters' download finished."))
 
@@ -1207,8 +1334,11 @@ class WinHizoTMDB(QMainWindow):
 
         self.ImagesLanguagesLabel.setText(translate("ConfigBox", "Posters' Languages:"))
         self.ImagesLanguagesWidget.setStatusTip(translate("ConfigBox", "Mandatory: The posters' languages to download."))
+
         # Les icônes plantent PyQt5
-        if PySideVersion == 6: self.ImagesLanguagesWidget.setTitle(translate("ConfigBox", "Languages available:"), QIcon.fromTheme("languages", QIcon("Ressources:edit-undo.svg")))
+        if PySideVersion == 6:
+            self.ImagesLanguagesWidget.setTitle(translate("ConfigBox", "Languages available:"), QIcon.fromTheme("languages", QIcon("Ressources:edit-undo.svg")))
+
         self.ImagesLanguagesWidget.contextMenuUpdate()
         self.ImagesLanguagesWidget.updateText()
 
@@ -1402,12 +1532,12 @@ class WinHizoTMDB(QMainWindow):
             #self.ExtractionThread.wait()
 
         # Sauvegarde de la taille de la fenêtre
-        Configs.setValue("hizo-tmdb/WinWidth", self.width())
-        Configs.setValue("hizo-tmdb/WinHeight", self.height())
+        Configs.setValue("WinWidth", self.width())
+        Configs.setValue("WinHeight", self.height())
 
         # Sauvegarde de la taille des Splitters
-        Configs.setValue("hizo-tmdb/WinSplitter", self.WinSplitter.sizes())
-        Configs.setValue("hizo-tmdb/TopSplitter", self.TopSplitter.sizes())
+        Configs.setValue("WinSplitter", self.WinSplitter.sizes())
+        Configs.setValue("TopSplitter", self.TopSplitter.sizes())
 
         # Force l'écriture dans le fichier de config'
         Configs.sync()
@@ -1462,43 +1592,51 @@ if __name__ == '__main__':
 
     # Création de l'application
     HizoTMDB = QApplication(args)
-    HizoTMDB.setApplicationVersion("22-06-15.0") # Version de l'application
+    HizoTMDB.setApplicationVersion("23-02-19.1") # Version de l'application
     HizoTMDB.setApplicationName("HizoTMDB") # Nom de l'application
     HizoTMDB.setWindowIcon(QIcon.fromTheme("hizo-tmdb", QIcon("Ressources:hizo-tmdb.png"))) # Icône de l'application
 
-    MyStyle = MyProxyStyle()
-    HizoTMDB.setStyle(MyStyle)
+    # Permet d'afficher les tooltip instantanément, avec pisyde2 ça consomme 8% de cpu en continue
+    if PySideVersion == 6:
+        MyStyle = MyProxyStyle()
+        HizoTMDB.setStyle(MyStyle)
 
-    ### Système de gestion des configurations QSettings
+
     ## Création ou ouverture du fichier de config
-    Configs = QSettings(QSettings.NativeFormat, QSettings.UserScope, "hizo-service-menus")
+    Configs = QSettings(QSettings.NativeFormat, QSettings.UserScope, "hizo-tmdb")
 
     # Ne conserve que les valeurs du bloc hizo-tmdb, les autres ne sont pas pour ce soft
     # utilisation d'un Dictionnaire car ils sont globaux de base, donc pas besoin d'utiliser global
     Global = {}
     Global['StopThread'] = False
 
-    Global['Token'] = Configs.value("hizo-tmdb/Token")
-    Global['ImageSize'] = int(Configs.value("hizo-tmdb/ImageSize", 200))
-    Global['NbPage'] = int(Configs.value("hizo-tmdb/NbPage", 1))
-    Global['WinWidth'] = int(Configs.value("hizo-tmdb/WinWidth", 650))
-    Global['WinHeight'] = int(Configs.value("hizo-tmdb/WinHeight", 550))
-    Global['AutoOpenDownloadFolder'] = int(Configs.value("hizo-tmdb/AutoOpenDownloadFolder", 0))
-    Global['AutoDl'] = int(Configs.value("hizo-tmdb/AutoDl", 0))
-    Global['AutoSearch'] = int(Configs.value("hizo-tmdb/AutoSearch", 1))
-    Global['TryMax'] = int(Configs.value("hizo-tmdb/TryMax", 5))
+    Global['Token'] = Configs.value("Token")
+    Global['ImageSize'] = int(Configs.value("ImageSize", 200))
+    Global['NbPage'] = int(Configs.value("NbPage", 1))
+    Global['WinWidth'] = int(Configs.value("WinWidth", 650))
+    Global['WinHeight'] = int(Configs.value("WinHeight", 550))
+    Global['AutoOpenDownloadFolder'] = int(Configs.value("AutoOpenDownloadFolder", 0))
+    Global['IncludeAdultSearch'] = int(Configs.value("IncludeAdultSearch", 0))
+    Global['AutoDl'] = int(Configs.value("AutoDl", 0))
+    Global['AutoSearch'] = int(Configs.value("AutoSearch", 1))
+    Global['TryMax'] = int(Configs.value("TryMax", 5))
 
     # Langues des affiches
-    Global['ImagesLanguages'] = Configs.value("hizo-tmdb/ImagesLanguages", ["en", "fr", "null"])
+    Global['ImagesLanguages'] = Configs.value("ImagesLanguages", ["en", "fr", "null"])
+
     if isinstance(Global['ImagesLanguages'], str):
         Global['ImagesLanguages'] = Global['ImagesLanguages'].split(", ")
 
     # Pour ces valeurs, il faut que ce soit des int et non des str
-    Global['WinSplitter'] = list(Configs.value("hizo-tmdb/WinSplitter", [0, 0]))
-    for i, element in enumerate(Global['WinSplitter']): Global['WinSplitter'][i] = int(element)
+    Global['WinSplitter'] = list(Configs.value("WinSplitter", [0, 0]))
 
-    Global['TopSplitter'] = list(Configs.value("hizo-tmdb/TopSplitter", [0, 0]))
-    for i, element in enumerate(Global['TopSplitter']): Global['TopSplitter'][i] = int(element)
+    for i, element in enumerate(Global['WinSplitter']):
+        Global['WinSplitter'][i] = int(element)
+
+    Global['TopSplitter'] = list(Configs.value("TopSplitter", [0, 0]))
+
+    for i, element in enumerate(Global['TopSplitter']):
+        Global['TopSplitter'][i] = int(element)
 
 
     ### Dossiers
@@ -1508,11 +1646,13 @@ if __name__ == '__main__':
     Global['TempFolder'] = QDir(TempFolder)
 
     # Dossier de téléchargement
-    DownloadFolder = Configs.value("hizo-tmdb/DownloadFolder")
+    DownloadFolder = Configs.value("DownloadFolder")
 
     if not DownloadFolder:
         DownloadFolder = QDir(QDir().absolutePath())
-        if not DownloadFolder.absolutePath().startswith("/home"): DownloadFolder = QDir(QDir().homePath())
+
+        if not DownloadFolder.absolutePath().startswith("/home"):
+            DownloadFolder = QDir(QDir().homePath())
 
     else:
         DownloadFolder = QDir(DownloadFolder)
@@ -1523,7 +1663,7 @@ if __name__ == '__main__':
     ### Traductions
     # pylupdate5 *.py QWidgetsCustom/*.py -ts Languages/hizo-tmdb_fr_FR.ts Languages/hizo-tmdb_en_EN.ts # -noobsolete
     # lrelease Languages/*.ts
-    Global['Language'] = Configs.value("hizo-tmdb/Language", QLocale().nativeLanguageName().capitalize())
+    Global['Language'] = Configs.value("Language", QLocale().nativeLanguageName().capitalize())
     Global["QTranslator"] = QTranslator() # Création d'un QTranslator
     GlobalTr = {}
 
