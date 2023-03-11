@@ -53,3 +53,7 @@ else
     echo "cannot find 'lrelease'"
     exit 1
 fi
+
+
+# Plus besoin de pyrcc5 pour générer des fichiers ressources.
+# Remplacé par : QDir.addSearchPath('Ressources', f"{AbsoluteFolder}/Ressources/")
