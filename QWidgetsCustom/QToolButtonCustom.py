@@ -1,51 +1,35 @@
-#!/bin/python3
-# This Python file uses the following encoding: utf-8
-
-try:
-    # Modules PySide6
-    from PySide6.QtGui import QIcon, QAction, QDesktopServices, QCursor
-    from PySide6.QtWidgets import QToolButton, QMenu
-    from PySide6.QtCore import Qt, QSize, QCoreApplication, QDir, QTemporaryDir, QEvent, QUrl
-
-    PySideVersion = 6
-
-except:
-    PySideVersion = 2
-
-    try:
-        # Modules PySide2
-        from PySide2.QtGui import QIcon, QDesktopServices, QCursor
-        from PySide2.QtWidgets import QToolButton, QMenu, QAction
-        from PySide2.QtCore import Qt, QSize, QCoreApplication, QDir, QTemporaryDir, QEvent, QUrl
-
-    except:
-        try:
-            # Modules PyQt5
-            from PyQt5.QtGui import QIcon, QDesktopServices, QCursor
-            from PyQt5.QtWidgets import QToolButton, QMenu, QAction
-            from PyQt5.QtCore import Qt, QSize, QCoreApplication, QDir, QTemporaryDir, QEvent, QUrl
-
-        except:
-            print("QToolButtonCustom : Impossible de trouver PySide6 / PySide2 / PyQt5.")
-            exit()
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
 
+################################
+## Importation des modules Qt ##
+################################
+from ModulesQt import *
 
-# Fonction permettant d'améliorer la lisibilité des lignes de traductions
-def translate(Groupe, Text):
-    return QCoreApplication.translate(Groupe, Text)
 
 
 #############################################################################
 class QToolButtonCustom(QToolButton):
-    def __init__(self, parent=None, id=None, icon=None, temp=None, ImageSize=200, text=None, tooltip=None, title=None, DownloadFolder=None):
-        QToolButton.__init__(self, parent)
+    def __init__(self, parent=None, icon=None, temp=None, ImageSize=200, downloadFolder=None, data=None):
+        # Ne pas utiliser super().__init__(*args, **kwargs) car QToolButton ne connaît pas mes variables
+        super(QToolButtonCustom, self).__init__()
 
         # Variables
         self.TemporaryImage = icon
-        self.title = title
-        self.id = id
-        self.downloadFolder(DownloadFolder)
+        self.data = data
+        self.id = data.get("id")
+        self.Source = data.get("media_type")
+        self.Title = data.get("title")
+        OriginalTitle = data.get("original_title")
+        ToolTipText = data.get("overview")
+        ReleaseDate = data.get("release_date")
+        self.generateDownloadFolder(downloadFolder)
+
+        if OriginalTitle and self.Title and self.Title != data.get('original_title'):
+            ToolTipTitle = f"{OriginalTitle}<br>{self.Title}"
+        else:
+            ToolTipTitle = self.Title
 
         # Config par défaut
         self.setEnabled(False)
@@ -58,74 +42,96 @@ class QToolButtonCustom(QToolButton):
         self.setIconSize(QSize(ImageSize, ImageSize))
 
         # Gestion du texte
-        self.setText(f"{id}\n{title}\n{text}")
+        self.setText(f"{self.Source} {self.id}\n{self.Title}\n{OriginalTitle}\n{ReleaseDate}")
+
+        palette = self.palette()
+
+        if self.Source.lower() == "tv":
+            palette.setColor(QPalette.ButtonText, Qt.darkGreen)
+        else:
+            palette.setColor(QPalette.ButtonText, Qt.darkBlue)
+
+        self.setPalette(palette)
+
 
         # Gestion de l'icône
-        if icon: self.setIcon(QIcon(icon))
+        if icon:
+            self.setIcon(QIcon(icon))
 
         # Gestion de l'info bulle
-        if tooltip: self.setToolTip(f"<div style='width: 500px;'>{tooltip}</div>")
+        if self.Title and ToolTipText:
+            self.setToolTip(f"<div style='width: 500px;'><b>{self.Title}</b><br>-----<br>{ToolTipText}</div>")
+
+        elif self.Title:
+            self.setToolTip(f"<div style='width: 500px;'><b>{self.Title}</b></div>")
 
         # Chargement des textes de base
         self.updateLang()
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def updateLang(self):
         """Fonction permettant de mettre à jour les textes lors des changements de langue."""
+        # Traductions
+        self.Translations = {}
+        self.Translations["DownloadAction"] = translate("QToolButtonCustom", "Open the download folder")
+        self.Translations["ViewImageAction"] = translate("QToolButtonCustom", "Open the temporary poster")
+        self.Translations["GoWebSiteAction"] = translate("QToolButtonCustom", "Go to the movie page on TMDB")
+        self.Translations["setStatusTip"] = translate("QToolButtonCustom", "There is a context menu with right click.")
+
         # Maj du status tip
-        self.setStatusTip(translate("QToolButtonCustom", "There is a context menu with right click."))
+        self.setStatusTip(self.Translations["setStatusTip"])
 
         # Recréation du menu
         self.menuCreation()
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def menuCreation(self):
         """Création du context menu."""
         self.contextMenu = QMenu(self)
 
-        DownloadAction =  QAction(QIcon.fromTheme("folder-download", QIcon("Ressources:folder-download.svg")), translate("QToolButtonCustom", "Open the download folder"), self.contextMenu)
+        DownloadAction = QAction(QIcon.fromTheme("folder-download", QIcon("Ressources:folder-download.svg")), self.Translations["DownloadAction"], self.contextMenu)
         DownloadAction.triggered.connect(self.openDownloadFolder)
         self.contextMenu.addAction(DownloadAction)
 
-        ViewImageAction =  QAction(QIcon.fromTheme("viewimage", QIcon("Ressources:viewimage.svg")), translate("QToolButtonCustom", "Open the temporary poster"), self.contextMenu)
+        ViewImageAction = QAction(QIcon.fromTheme("viewimage", QIcon("Ressources:viewimage.svg")), self.Translations["ViewImageAction"], self.contextMenu)
         ViewImageAction.triggered.connect(self.openTemporaryPoster)
         self.contextMenu.addAction(ViewImageAction)
 
         self.contextMenu.addSeparator()
 
-        GoWebSiteAction =  QAction(QIcon.fromTheme("link", QIcon("Ressources:link.svg")), translate("QToolButtonCustom", "Go to the movie page on TMDB"), self.contextMenu)
-        GoWebSiteAction.triggered.connect(lambda: QDesktopServices.openUrl(QUrl(f"https://www.themoviedb.org/movie/{self.id}")))
+        GoWebSiteAction = QAction(QIcon.fromTheme("link", QIcon("Ressources:link.svg")), self.Translations["GoWebSiteAction"], self.contextMenu)
+        GoWebSiteAction.triggered.connect(lambda: QDesktopServices.openUrl(QUrl(f"https://www.themoviedb.org/{self.Source}/{self.id}")))
         self.contextMenu.addAction(GoWebSiteAction)
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def openTemporaryPoster(self):
         """Fonction ouvrant le poster temporaire."""
         if QDir().exists(self.TemporaryImage):
             temp = QDesktopServices.openUrl(QUrl(self.TemporaryImage))
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def openDownloadFolder(self):
         """Fonction ouvrant le dossier de téléchargement."""
-        if QDir().exists(self.DownloadFolder):
-            QDesktopServices.openUrl(QUrl.fromLocalFile(self.DownloadFolder))
+        if QDir().exists(self.downloadFolder):
+            QDesktopServices.openUrl(QUrl.fromLocalFile(self.downloadFolder))
 
 
-    #========================================================================
-    def downloadFolder(self, DownloadFolder):
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def generateDownloadFolder(self, downloadFolder):
         """Fonction générant un nom de dossier de téléchargement."""
-        self.DownloadFolder = QTemporaryDir(DownloadFolder + "/" + self.title).path()
+        self.downloadFolder = QTemporaryDir(downloadFolder + "/" + self.Title).path()
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def mousePressEvent(self, event):
         """Fonction de récupération des touches souris utilisées."""
         # Affichage du menu au clic droit
         if event.button() == Qt.RightButton:
-            if PySideVersion == 6:
+            if QtVersion == 6:
                 # PySide6
                 self.contextMenu.exec(QCursor.pos())
 

@@ -1,34 +1,22 @@
-#!/bin/python3
-# This Python file uses the following encoding: utf-8
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
-try:
-    # Modules PySide6
-    from PySide6.QtWidgets import QLayout, QWidgetItem
-    from PySide6.QtCore import Qt, QRect, QSize, QPoint
+# 23/02/24 : orderByObjectName added.
 
-except:
-    try:
-        # Modules PySide2
-        from PySide2.QtWidgets import QLayout, QWidgetItem
-        from PySide2.QtCore import Qt, QRect, QSize, QPoint
-
-    except:
-        try:
-            # Modules PyQt5
-            from PyQt5.QtWidgets import QLayout, QWidgetItem
-            from PyQt5.QtCore import Qt, QRect, QSize, QPoint
-
-        except:
-            print("QFlowLayout : Impossible de trouver PySide6 / PySide2 / PyQt5.")
-            exit()
+################################
+## Importation des modules Qt ##
+################################
+from ModulesQt import *
 
 
-
-
+##########################
+## QLayout personnalisé ##
+##########################
 class QFlowLayout(QLayout):
     """QLayout personnalisé qui renvoie ses widgets à la ligne si besoin."""
 
-    def __init__(self, parent=None, margin=0, spacing=0):
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def __init__(self, parent=None, margin=0, spacing=0, orderByObjectName=False, orderReverse=False):
         # margin : Marge entre les items et et les bords du QLayout
         # spacing : marge entre les items
 
@@ -39,36 +27,43 @@ class QFlowLayout(QLayout):
         self.margin = margin
         self.spacing = spacing
         self.index = 0
+        self.orderByObjectName = orderByObjectName
+        self.orderReverse = orderReverse
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def __del__(self):
         """Suppression des widgets du QLayout."""
         item = self.takeAt(0)
-        while item: item = self.takeAt(0)
+
+        while item:
+            item = self.takeAt(0)
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def addItem(self, item):
-        """Ajoute un item à la fin du QLayout, fonction appelée par addWidgetet qui va relancer doLayout."""
-        # Permet de connaitre l'ordre d'insertion
+        """Ajoute un item à la fin du QLayout, fonction appelée par addWidget et qui va relancer doLayout."""
+        # Permet de connaître l'ordre d'insertion
         x = len(self.itemList) - 1
-        if x < 0: x = 0
+
+        if x < 0:
+            x = 0
 
         # Remplissage de la liste avec des dictionnaires car ça permet de les ranger dans doLayout
-        self.itemList.append({'index': x, 'widget': item, 'sort': self.index})
+        self.itemList.append({'index': x, 'widget': item, 'sort': self.index, 'name': item.widget().objectName()})
 
         # Réinitialisation de l'index pour qu'il ne soit pas utilisé lors d'un simple addWidget
-        if self.index: self.index = 0
+        if self.index:
+            self.index = 0
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def count(self):
         """Retourne le nombre d'item du QLayout."""
         return len(self.itemList)
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def itemAt(self, index):
         """Renvoi l'item demandé."""
         if index >= 0 and index < len(self.itemList):
@@ -77,7 +72,7 @@ class QFlowLayout(QLayout):
         return None
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def takeAt(self, index):
         """Supprime l'item indiqué du QLayout."""
         if index >= 0 and index < len(self.itemList):
@@ -86,40 +81,40 @@ class QFlowLayout(QLayout):
         return None
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def insertWidget(self, index, widget):
         """Insertion d'un widget à un emplacement."""
         self.index = index
         self.addWidget(widget)
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def expandingDirections(self):
         """Le QLayout ne s'étend qu'horizontalement."""
         return Qt.Orientations(Qt.Horizontal)
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def hasHeightForWidth(self):
         """If this layout's preferred height depends on its width."""
         return True
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def heightForWidth(self, width):
         """Get the preferred height a layout item with the given width."""
         height = self.doLayout(QRect(0, 0, width, 0), True)
         return height
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def setGeometry(self, rect):
         """Indique la taille du QLayout."""
         super(QFlowLayout, self).setGeometry(rect)
         self.doLayout(rect, False)
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def sizeHint(self):
         """Retourne la taille préférée du QLayout."""
         size = QSize()
@@ -131,7 +126,22 @@ class QFlowLayout(QLayout):
         return size
 
 
-    #========================================================================
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def setOrderByObjectName(self, Value):
+        """Fonction permettant de trier le contenu automatiquement par ordre de object name."""
+        self.orderByObjectName = Value
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def setOrderReverse(self, Value):
+        """Fonction permettant d'inverser le tri de object name."""
+        self.orderReverse = Value
+
+        # L'update permet de relancer le doLayout
+        self.update()
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def doLayout(self, rect, testOnly):
         """Mise en place des items."""
         # Ajout aussi la marge entre le QLayout et ses Items
@@ -139,8 +149,16 @@ class QFlowLayout(QLayout):
         y = rect.y() + self.margin
         lineHeight = 0
 
+        # Rangement par nom d'objet
+        if self.orderByObjectName:
+            ListOrdered = sorted(self.itemList, key=lambda k: (k['name'], k['index']), reverse=self.orderReverse)
+
+        # Rangement par index donné manuellement
+        else:
+            ListOrdered = sorted(self.itemList, key=lambda k: (k['sort'], k['index']))
+
         # Traite les items 1 par 1 en les rangeant
-        for widget in sorted(self.itemList, key=lambda k: (k['sort'], k['index'])):
+        for widget in ListOrdered:
             item = widget['widget']
 
             # Emplacement x + largeur de l'item + marge
@@ -155,7 +173,8 @@ class QFlowLayout(QLayout):
                 lineHeight = 0
 
             # Si ce n'est pas un test, envoie de l'emplacement de l'item
-            if not testOnly: item.setGeometry(QRect(QPoint(x, y), item.sizeHint()))
+            if not testOnly:
+                item.setGeometry(QRect(QPoint(x, y), item.sizeHint()))
 
             # Décalage de x
             x = nextX

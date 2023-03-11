@@ -6,34 +6,18 @@ Fenêtre affichant le changelog demandé.
 Le nom du soft est coloré comme tous les textes entre (), [] et <>.
 """
 
+####################################
+## Importation des modules python ##
+####################################
 ### Importation de gzip permettant de lire le fichier changelog compressé
 import gzip
 import sys
 
-try:
-    # Modules PySide6
-    from PySide6.QtGui import QTextCursor
-    from PySide6.QtWidgets import QDialog, QVBoxLayout, QApplication, QTextEdit, QDialogButtonBox, QHBoxLayout
-    from PySide6.QtCore import Qt, QFileInfo
 
-except:
-    try:
-        # Modules PySide2
-        from PySide2.QtGui import QTextCursor
-        from PySide2.QtWidgets import QDialog, QVBoxLayout, QApplication, QTextEdit, QDialogButtonBox, QHBoxLayout
-        from PySide2.QtCore import Qt, QFileInfo
-
-    except:
-        try:
-            # Modules PyQt5
-            from PyQt5.QtGui import QTextCursor
-            from PyQt5.QtWidgets import QDialog, QVBoxLayout, QApplication, QTextEdit, QDialogButtonBox, QHBoxLayout
-            from PyQt5.QtCore import Qt, QFileInfo
-
-        except:
-            print("QDialogWhatsUp : Impossible de trouver PySide6 / PySide2 / PyQt5.")
-            exit()
-
+############################################################
+## Importation des modules Qt depuis le fichier ModulesQt ##
+############################################################
+from ModulesQt import *
 
 
 
@@ -97,7 +81,10 @@ class QDialogWhatsUp(QDialog):
 
         ### Bouton de sortie
         Button = QDialogButtonBox(QDialogButtonBox.Close, Dialog)
-        if Close: Button.button(Button.Close).setText(Close)
+
+        if Close:
+            Button.button(QDialogButtonBox.Close).setText(Close)
+
         Button.clicked.connect(Dialog.close)
 
         ### Présentation de la fenêtre
@@ -117,10 +104,10 @@ class QDialogWhatsUp(QDialog):
 
 #############################################################################
 if __name__ == '__main__':
-    ### Arg 1 : Nom du fichir gz à lire
-    ### Arg 2 : Nom du paquet à colorer
-    ### Arg 3 : Titre de la fenêtre
-    ### Arg 4 : Parent pour bien placer la fenêtre et utiliser son icône
+    # Arg 1 : Nom du fichier gz à lire
+    # Arg 2 : Nom du paquet à colorer
+    # Arg 3 : Titre de la fenêtre
+    # Arg 4 : Parent pour bien placer la fenêtre et utiliser son icône
 
     ### Vérification du nombre d'argument
     if len(sys.argv) < 4:

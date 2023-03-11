@@ -1,0 +1,917 @@
+[
+  {
+    "data": "ab",
+    "text": "Abkhazian",
+    "icon": "Flags:ab.svg"
+  },
+  {
+    "data": "aa",
+    "text": "Afar",
+    "icon": "Flags:aa.svg"
+  },
+  {
+    "data": "af",
+    "text": "Afrikaans (Afrikaans)",
+    "icon": "Flags:af.svg"
+  },
+  {
+    "data": "ak",
+    "text": "Akan"
+  },
+  {
+    "data": "sq",
+    "text": "Albanian (shqip)",
+    "icon": "Flags:sq.svg"
+  },
+  {
+    "data": "am",
+    "text": "Amharic"
+  },
+  {
+    "data": "ar",
+    "text": "Arabic (\u0627\u0644\u0639\u0631\u0628\u064a\u0629)"
+  },
+  {
+    "data": "an",
+    "text": "Aragonese",
+    "icon": "Flags:an.svg"
+  },
+  {
+    "data": "hy",
+    "text": "Armenian",
+    "icon": "Flags:hy.svg"
+  },
+  {
+    "data": "as",
+    "text": "Assamese",
+    "icon": "Flags:as.svg"
+  },
+  {
+    "data": "av",
+    "text": "Avaric",
+    "icon": "Flags:av.svg"
+  },
+  {
+    "data": "ae",
+    "text": "Avestan",
+    "icon": "Flags:ae.svg"
+  },
+  {
+    "data": "ay",
+    "text": "Aymara",
+    "icon": "Flags:ay.svg"
+  },
+  {
+    "data": "az",
+    "text": "Azerbaijani (Az\u0259rbaycan)",
+    "icon": "Flags:az.svg"
+  },
+  {
+    "data": "bm",
+    "text": "Bambara (Bamanankan)",
+    "icon": "Flags:bm.svg"
+  },
+  {
+    "data": "ba",
+    "text": "Bashkir",
+    "icon": "Flags:ba.svg"
+  },
+  {
+    "data": "eu",
+    "text": "Basque (euskera)",
+    "icon": "Flags:eu.svg"
+  },
+  {
+    "data": "be",
+    "text": "Belarusian (\u0431\u0435\u043b\u0430\u0440\u0443\u0441\u043a\u0430\u044f \u043c\u043e\u0432\u0430)",
+    "icon": "Flags:be.svg"
+  },
+  {
+    "data": "bn",
+    "text": "Bengali (\u09ac\u09be\u0982\u09b2\u09be)",
+    "icon": "Flags:bn.svg"
+  },
+  {
+    "data": "bi",
+    "text": "Bislama",
+    "icon": "Flags:bi.svg"
+  },
+  {
+    "data": "bs",
+    "text": "Bosnian (Bosanski)",
+    "icon": "Flags:bs.svg"
+  },
+  {
+    "data": "br",
+    "text": "Breton",
+    "icon": "Flags:br.svg"
+  },
+  {
+    "data": "bg",
+    "text": "Bulgarian (\u0431\u044a\u043b\u0433\u0430\u0440\u0441\u043a\u0438 \u0435\u0437\u0438\u043a)",
+    "icon": "Flags:bg.svg"
+  },
+  {
+    "data": "my",
+    "text": "Burmese",
+    "icon": "Flags:my.svg"
+  },
+  {
+    "data": "cn",
+    "text": "Cantonese (\u5e7f\u5dde\u8bdd / \u5ee3\u5dde\u8a71)",
+    "icon": "Flags:cn.svg"
+  },
+  {
+    "data": "ca",
+    "text": "Catalan (Catal\u00e0)",
+    "icon": "Flags:ca.svg"
+  },
+  {
+    "data": "ch",
+    "text": "Chamorro (Finu' Chamorro)",
+    "icon": "Flags:ch.svg"
+  },
+  {
+    "data": "ce",
+    "text": "Chechen",
+    "icon": "Flags:ce.svg"
+  },
+  {
+    "data": "ny",
+    "text": "Chichewa; Nyanja",
+    "icon": "Flags:ny.svg"
+  },
+  {
+    "data": "cv",
+    "text": "Chuvash",
+    "icon": "Flags:cv.svg"
+  },
+  {
+    "data": "kw",
+    "text": "Cornish",
+    "icon": "Flags:kw.svg"
+  },
+  {
+    "data": "co",
+    "text": "Corsican",
+    "icon": "Flags:co.svg"
+  },
+  {
+    "data": "cr",
+    "text": "Cree",
+    "icon": "Flags:cr.svg"
+  },
+  {
+    "data": "hr",
+    "text": "Croatian (Hrvatski)",
+    "icon": "Flags:hr.svg"
+  },
+  {
+    "data": "cs",
+    "text": "Czech (\u010cesk\u00fd)",
+    "icon": "Flags:cs.svg"
+  },
+  {
+    "data": "da",
+    "text": "Danish (Dansk)",
+    "icon": "Flags:da.svg"
+  },
+  {
+    "data": "dv",
+    "text": "Divehi",
+    "icon": "Flags:dv.svg"
+  },
+  {
+    "data": "nl",
+    "text": "Dutch (Nederlands)",
+    "icon": "Flags:nl.svg"
+  },
+  {
+    "data": "dz",
+    "text": "Dzongkha",
+    "icon": "Flags:dz.svg"
+  },
+  {
+    "data": "en",
+    "text": "English (English)",
+    "icon": "Flags:en.svg"
+  },
+  {
+    "data": "eo",
+    "text": "Esperanto (Esperanto)",
+    "icon": "Flags:eo.svg"
+  },
+  {
+    "data": "et",
+    "text": "Estonian (Eesti)",
+    "icon": "Flags:et.svg"
+  },
+  {
+    "data": "ee",
+    "text": "Ewe (\u00c8\u028begbe)",
+    "icon": "Flags:ee.svg"
+  },
+  {
+    "data": "fo",
+    "text": "Faroese",
+    "icon": "Flags:fo.svg"
+  },
+  {
+    "data": "fj",
+    "text": "Fijian",
+    "icon": "Flags:fj.svg"
+  },
+  {
+    "data": "fi",
+    "text": "Finnish (suomi)",
+    "icon": "Flags:fi.svg"
+  },
+  {
+    "data": "fr",
+    "text": "French (Fran\u00e7ais)",
+    "icon": "Flags:fr.svg"
+  },
+  {
+    "data": "fy",
+    "text": "Frisian",
+    "icon": "Flags:fy.svg"
+  },
+  {
+    "data": "ff",
+    "text": "Fulah (Fulfulde)"
+  },
+  {
+    "data": "gd",
+    "text": "Gaelic",
+    "icon": "Flags:gd.svg"
+  },
+  {
+    "data": "gl",
+    "text": "Galician (Galego)",
+    "icon": "Flags:gl.svg"
+  },
+  {
+    "data": "lg",
+    "text": "Ganda",
+    "icon": "Flags:lg.svg"
+  },
+  {
+    "data": "ka",
+    "text": "Georgian (\u10e5\u10d0\u10e0\u10d7\u10e3\u10da\u10d8)",
+    "icon": "Flags:ka.svg"
+  },
+  {
+    "data": "de",
+    "text": "German (Deutsch)",
+    "icon": "Flags:de.svg"
+  },
+  {
+    "data": "el",
+    "text": "Greek (\u03b5\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac)",
+    "icon": "Flags:el.svg"
+  },
+  {
+    "data": "gn",
+    "text": "Guarani"
+  },
+  {
+    "data": "gu",
+    "text": "Gujarati"
+  },
+  {
+    "data": "ht",
+    "text": "Haitian; Haitian Creole",
+    "icon": "Flags:ht.svg"
+  },
+  {
+    "data": "ha",
+    "text": "Hausa (Hausa)"
+  },
+  {
+    "data": "he",
+    "text": "Hebrew (\u05e2\u05b4\u05d1\u05b0\u05e8\u05b4\u05d9\u05ea)",
+    "icon": "Flags:he.svg"
+  },
+  {
+    "data": "hz",
+    "text": "Herero",
+    "icon": "Flags:hz.svg"
+  },
+  {
+    "data": "hi",
+    "text": "Hindi (\u0939\u093f\u0928\u094d\u0926\u0940)",
+    "icon": "Flags:hi.svg"
+  },
+  {
+    "data": "ho",
+    "text": "Hiri Motu",
+    "icon": "Flags:ho.svg"
+  },
+  {
+    "data": "hu",
+    "text": "Hungarian (Magyar)",
+    "icon": "Flags:hu.svg"
+  },
+  {
+    "data": "is",
+    "text": "Icelandic (\u00cdslenska)",
+    "icon": "Flags:is.svg"
+  },
+  {
+    "data": "io",
+    "text": "Ido"
+  },
+  {
+    "data": "ig",
+    "text": "Igbo",
+    "icon": "Flags:ig.svg"
+  },
+  {
+    "data": "id",
+    "text": "Indonesian (Bahasa indonesia)",
+    "icon": "Flags:id.svg"
+  },
+  {
+    "data": "ia",
+    "text": "Interlingua"
+  },
+  {
+    "data": "ie",
+    "text": "Interlingue"
+  },
+  {
+    "data": "iu",
+    "text": "Inuktitut",
+    "icon": "Flags:iu.svg"
+  },
+  {
+    "data": "ik",
+    "text": "Inupiaq",
+    "icon": "Flags:ik.svg"
+  },
+  {
+    "data": "ga",
+    "text": "Irish (Gaeilge)",
+    "icon": "Flags:ga.svg"
+  },
+  {
+    "data": "it",
+    "text": "Italian (Italiano)",
+    "icon": "Flags:it.svg"
+  },
+  {
+    "data": "ja",
+    "text": "Japanese (\u65e5\u672c\u8a9e)",
+    "icon": "Flags:ja.svg"
+  },
+  {
+    "data": "jv",
+    "text": "Javanese",
+    "icon": "Flags:jv.svg"
+  },
+  {
+    "data": "kl",
+    "text": "Kalaallisut",
+    "icon": "Flags:kl.svg"
+  },
+  {
+    "data": "kn",
+    "text": "Kannada (?????)",
+    "icon": "Flags:kn.svg"
+  },
+  {
+    "data": "kr",
+    "text": "Kanuri",
+    "icon": "Flags:kr.svg"
+  },
+  {
+    "data": "ks",
+    "text": "Kashmiri",
+    "icon": "Flags:ks.svg"
+  },
+  {
+    "data": "kk",
+    "text": "Kazakh (\u049b\u0430\u0437\u0430\u049b)",
+    "icon": "Flags:kk.svg"
+  },
+  {
+    "data": "km",
+    "text": "Khmer",
+    "icon": "Flags:km.svg"
+  },
+  {
+    "data": "ki",
+    "text": "Kikuyu",
+    "icon": "Flags:ki.svg"
+  },
+  {
+    "data": "rw",
+    "text": "Kinyarwanda (Kinyarwanda)",
+    "icon": "Flags:rw.svg"
+  },
+  {
+    "data": "ky",
+    "text": "Kirghiz (??????)",
+    "icon": "Flags:ky.svg"
+  },
+  {
+    "data": "kv",
+    "text": "Komi",
+    "icon": "Flags:kv.svg"
+  },
+  {
+    "data": "kg",
+    "text": "Kongo",
+    "icon": "Flags:kg.svg"
+  },
+  {
+    "data": "ko",
+    "text": "Korean (\ud55c\uad6d\uc5b4/\uc870\uc120\ub9d0)",
+    "icon": "Flags:ko.svg"
+  },
+  {
+    "data": "kj",
+    "text": "Kuanyama"
+  },
+  {
+    "data": "ku",
+    "text": "Kurdish",
+    "icon": "Flags:ku.svg"
+  },
+  {
+    "data": "lo",
+    "text": "Lao",
+    "icon": "Flags:lo.svg"
+  },
+  {
+    "data": "la",
+    "text": "Latin (Latin)",
+    "icon": "Flags:la.svg"
+  },
+  {
+    "data": "lv",
+    "text": "Latvian (Latvie\u0161u)",
+    "icon": "Flags:lv.svg"
+  },
+  {
+    "data": "lb",
+    "text": "Letzeburgesch",
+    "icon": "Flags:lb.svg"
+  },
+  {
+    "data": "li",
+    "text": "Limburgish",
+    "icon": "Flags:li.svg"
+  },
+  {
+    "data": "ln",
+    "text": "Lingala"
+  },
+  {
+    "data": "lt",
+    "text": "Lithuanian (Lietuvi\u0173)",
+    "icon": "Flags:lt.svg"
+  },
+  {
+    "data": "lu",
+    "text": "Luba-Katanga",
+    "icon": "Flags:lu.svg"
+  },
+  {
+    "data": "mk",
+    "text": "Macedonian",
+    "icon": "Flags:mk.svg"
+  },
+  {
+    "data": "mg",
+    "text": "Malagasy",
+    "icon": "Flags:mg.svg"
+  },
+  {
+    "data": "ms",
+    "text": "Malay (Bahasa melayu)"
+  },
+  {
+    "data": "ml",
+    "text": "Malayalam",
+    "icon": "Flags:ml.svg"
+  },
+  {
+    "data": "mt",
+    "text": "Maltese (Malti)",
+    "icon": "Flags:mt.svg"
+  },
+  {
+    "data": "zh",
+    "text": "Mandarin (\u666e\u901a\u8bdd)",
+    "icon": "Flags:zh.svg"
+  },
+  {
+    "data": "gv",
+    "text": "Manx",
+    "icon": "Flags:gv.svg"
+  },
+  {
+    "data": "mi",
+    "text": "Maori",
+    "icon": "Flags:mi.svg"
+  },
+  {
+    "data": "mr",
+    "text": "Marathi",
+    "icon": "Flags:mr.svg"
+  },
+  {
+    "data": "mh",
+    "text": "Marshall",
+    "icon": "Flags:mh.svg"
+  },
+  {
+    "data": "mo",
+    "text": "Moldavian",
+    "icon": "Flags:mo.svg"
+  },
+  {
+    "data": "mn",
+    "text": "Mongolian",
+    "icon": "Flags:mn.svg"
+  },
+  {
+    "data": "na",
+    "text": "Nauru",
+    "icon": "Flags:na.svg"
+  },
+  {
+    "data": "nv",
+    "text": "Navajo"
+  },
+  {
+    "data": "nr",
+    "text": "Ndebele",
+    "icon": "Flags:nr.svg"
+  },
+  {
+    "data": "nd",
+    "text": "Ndebele",
+    "icon": "Flags:nd.svg"
+  },
+  {
+    "data": "ng",
+    "text": "Ndonga"
+  },
+  {
+    "data": "ne",
+    "text": "Nepali",
+    "icon": "Flags:ne.svg"
+  },
+  {
+    "data": "xx",
+    "text": "No Language (No Language)"
+  },
+  {
+    "data": "se",
+    "text": "Northern Sami",
+    "icon": "Flags:se.svg"
+  },
+  {
+    "data": "no",
+    "text": "Norwegian (Norsk)",
+    "icon": "Flags:no.svg"
+  },
+  {
+    "data": "nb",
+    "text": "Norwegian Bokm\u00e5l (Bokm\u00e5l)",
+    "icon": "Flags:nb.svg"
+  },
+  {
+    "data": "nn",
+    "text": "Norwegian Nynorsk",
+    "icon": "Flags:nn.svg"
+  },
+  {
+    "data": "oc",
+    "text": "Occitan"
+  },
+  {
+    "data": "oj",
+    "text": "Ojibwa"
+  },
+  {
+    "data": "or",
+    "text": "Oriya",
+    "icon": "Flags:or.svg"
+  },
+  {
+    "data": "om",
+    "text": "Oromo",
+    "icon": "Flags:om.svg"
+  },
+  {
+    "data": "os",
+    "text": "Ossetian; Ossetic",
+    "icon": "Flags:os.svg"
+  },
+  {
+    "data": "pi",
+    "text": "Pali",
+    "icon": "Flags:pi.svg"
+  },
+  {
+    "data": "fa",
+    "text": "Persian (\u0641\u0627\u0631\u0633\u06cc)",
+    "icon": "Flags:fa.svg"
+  },
+  {
+    "data": "pl",
+    "text": "Polish (Polski)",
+    "icon": "Flags:pl.svg"
+  },
+  {
+    "data": "pt",
+    "text": "Portuguese (Portugu\u00eas)",
+    "icon": "Flags:pt.svg"
+  },
+  {
+    "data": "pa",
+    "text": "Punjabi (\u0a2a\u0a70\u0a1c\u0a3e\u0a2c\u0a40)",
+    "icon": "Flags:pa.svg"
+  },
+  {
+    "data": "ps",
+    "text": "Pushto (\u067e\u069a\u062a\u0648)",
+    "icon": "Flags:ps.svg"
+  },
+  {
+    "data": "qu",
+    "text": "Quechua",
+    "icon": "Flags:qu.svg"
+  },
+  {
+    "data": "rm",
+    "text": "Raeto-Romance",
+    "icon": "Flags:rm.svg"
+  },
+  {
+    "data": "ro",
+    "text": "Romanian (Rom\u00e2n\u0103)",
+    "icon": "Flags:ro.svg"
+  },
+  {
+    "data": "rn",
+    "text": "Rundi (Kirundi)",
+    "icon": "Flags:rn.svg"
+  },
+  {
+    "data": "ru",
+    "text": "Russian (P\u0443\u0441\u0441\u043a\u0438\u0439)",
+    "icon": "Flags:ru.svg"
+  },
+  {
+    "data": "sm",
+    "text": "Samoan",
+    "icon": "Flags:sm.svg"
+  },
+  {
+    "data": "sg",
+    "text": "Sango",
+    "icon": "Flags:sg.svg"
+  },
+  {
+    "data": "sa",
+    "text": "Sanskrit",
+    "icon": "Flags:sa.svg"
+  },
+  {
+    "data": "sc",
+    "text": "Sardinian",
+    "icon": "Flags:sc.svg"
+  },
+  {
+    "data": "sr",
+    "text": "Serbian (Srpski)",
+    "icon": "Flags:sr.svg"
+  },
+  {
+    "data": "sh",
+    "text": "Serbo-Croatian",
+    "icon": "Flags:sh.svg"
+  },
+  {
+    "data": "sn",
+    "text": "Shona",
+    "icon": "Flags:sn.svg"
+  },
+  {
+    "data": "sd",
+    "text": "Sindhi",
+    "icon": "Flags:sd.svg"
+  },
+  {
+    "data": "si",
+    "text": "Sinhalese (\u0dc3\u0dd2\u0d82\u0dc4\u0dbd)",
+    "icon": "Flags:si.svg"
+  },
+  {
+    "data": "cu",
+    "text": "Slavic"
+  },
+  {
+    "data": "sk",
+    "text": "Slovak (Sloven\u010dina)",
+    "icon": "Flags:sk.svg"
+  },
+  {
+    "data": "sl",
+    "text": "Slovenian (Sloven\u0161\u010dina)",
+    "icon": "Flags:sl.svg"
+  },
+  {
+    "data": "so",
+    "text": "Somali (Somali)",
+    "icon": "Flags:so.svg"
+  },
+  {
+    "data": "st",
+    "text": "Sotho",
+    "icon": "Flags:st.svg"
+  },
+  {
+    "data": "es",
+    "text": "Spanish (Espa\u00f1ol)",
+    "icon": "Flags:es.svg"
+  },
+  {
+    "data": "su",
+    "text": "Sundanese",
+    "icon": "Flags:su.svg"
+  },
+  {
+    "data": "sw",
+    "text": "Swahili (Kiswahili)",
+    "icon": "Flags:sw.svg"
+  },
+  {
+    "data": "ss",
+    "text": "Swati",
+    "icon": "Flags:ss.svg"
+  },
+  {
+    "data": "sv",
+    "text": "Swedish (svenska)",
+    "icon": "Flags:sv.svg"
+  },
+  {
+    "data": "tl",
+    "text": "Tagalog",
+    "icon": "Flags:tl.svg"
+  },
+  {
+    "data": "ty",
+    "text": "Tahitian",
+    "icon": "Flags:ty.svg"
+  },
+  {
+    "data": "tg",
+    "text": "Tajik",
+    "icon": "Flags:tg.svg"
+  },
+  {
+    "data": "ta",
+    "text": "Tamil (\u0ba4\u0bae\u0bbf\u0bb4\u0bcd)"
+  },
+  {
+    "data": "tt",
+    "text": "Tatar",
+    "icon": "Flags:tt.svg"
+  },
+  {
+    "data": "te",
+    "text": "Telugu (\u0c24\u0c46\u0c32\u0c41\u0c17\u0c41)",
+    "icon": "Flags:te.svg"
+  },
+  {
+    "data": "th",
+    "text": "Thai (\u0e20\u0e32\u0e29\u0e32\u0e44\u0e17\u0e22)",
+    "icon": "Flags:th.svg"
+  },
+  {
+    "data": "bo",
+    "text": "Tibetan",
+    "icon": "Flags:bo.svg"
+  },
+  {
+    "data": "ti",
+    "text": "Tigrinya",
+    "icon": "Flags:ti.svg"
+  },
+  {
+    "data": "to",
+    "text": "Tonga",
+    "icon": "Flags:to.svg"
+  },
+  {
+    "data": "ts",
+    "text": "Tsonga"
+  },
+  {
+    "data": "tn",
+    "text": "Tswana",
+    "icon": "Flags:tn.svg"
+  },
+  {
+    "data": "tr",
+    "text": "Turkish (T\u00fcrk\u00e7e)",
+    "icon": "Flags:tr.svg"
+  },
+  {
+    "data": "tk",
+    "text": "Turkmen",
+    "icon": "Flags:tk.svg"
+  },
+  {
+    "data": "tw",
+    "text": "Twi",
+    "icon": "Flags:tw.svg"
+  },
+  {
+    "data": "ug",
+    "text": "Uighur",
+    "icon": "Flags:ug.svg"
+  },
+  {
+    "data": "uk",
+    "text": "Ukrainian (\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0438\u0439)",
+    "icon": "Flags:uk.svg"
+  },
+  {
+    "data": "ur",
+    "text": "Urdu (\u0627\u0631\u062f\u0648)",
+    "icon": "Flags:ur.svg"
+  },
+  {
+    "data": "uz",
+    "text": "Uzbek (ozbek)",
+    "icon": "Flags:uz.svg"
+  },
+  {
+    "data": "ve",
+    "text": "Venda"
+  },
+  {
+    "data": "vi",
+    "text": "Vietnamese (Ti\u1ebfng Vi\u1ec7t)",
+    "icon": "Flags:vi.svg"
+  },
+  {
+    "data": "vo",
+    "text": "Volap\u00fck"
+  },
+  {
+    "data": "wa",
+    "text": "Walloon",
+    "icon": "Flags:wa.svg"
+  },
+  {
+    "data": "cy",
+    "text": "Welsh (Cymraeg)",
+    "icon": "Flags:cy.svg"
+  },
+  {
+    "data": "wo",
+    "text": "Wolof (Wolof)",
+    "icon": "Flags:wo.svg"
+  },
+  {
+    "data": "xh",
+    "text": "Xhosa",
+    "icon": "Flags:xh.svg"
+  },
+  {
+    "data": "ii",
+    "text": "Yi",
+    "icon": "Flags:ii.svg"
+  },
+  {
+    "data": "yi",
+    "text": "Yiddish",
+    "icon": "Flags:yi.svg"
+  },
+  {
+    "data": "yo",
+    "text": "Yoruba (\u00c8d\u00e8 Yor\u00f9b\u00e1)"
+  },
+  {
+    "data": "za",
+    "text": "Zhuang",
+    "icon": "Flags:za.svg"
+  },
+  {
+    "data": "zu",
+    "text": "Zulu (isiZulu)",
+    "icon": "Flags:zu.svg"
+  },
+  {
+    "text": "null - Aucune",
+    "data": "null"
+  }
+]
