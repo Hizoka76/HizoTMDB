@@ -2,40 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-# Maj traduction Fr
-# Maj PyQt6 des objets custom
-# Création d'un fichier pour QScrollAreaCustom
-# Suppression d'un double chargement de sys
-# Blocage du reboot si echec de chargement de os.execl
-# Blocage des commandes utilisant popen si echec de chargement de os.popen
-# Amlioration de la lisibilité du code
-# Utilisation d'un fichier json pour la liste des langues
-# Ajout d'un bouton pour recharger la liste des languies
-# Fusion de fonctions en UpdateOptions
-# Modification du fonctionnement de chargement des modules
-# Maj de QCheckComboBox
-# Correction et amélioration de la fenêtre à propos
-# Modification des imports des fichiers cutom
-# Utilisation de variables globale pour les headers et timeout
-# Modification du fonctionnement des téléchargement, toutes les pages se font en parallele maintenant
-# Rangement des films par nom
-# Refonte complete de la box progression
-# Suppression du dossier de dl lors de l'annualtion du travail lors du dl
-# Ajout de la possibilité de télécharger les fond d'ecrans et les logos
-# Amélioration du QCheckComboBox avec ajout de signaux et fonctions
-# Ajout des sources films et series
-# Amelioration de QToolButtonCustom
-# Ajout d'une option pour le tri des films
-# Rassemblement de mise à jour des valeurs bloquantes
-# Modification du widget de la taille des vignettes
-# Ajout d'un widget de suivi des infos
-# Verification que tout est OK avant de lancer la recherche des arguments
-# Délocalisation de QPushQuitButton dans un fichier externe
-# detection d'un bug pyside6-lupdate, contourné : https://forum.qt.io/topic/143397/pyside6-lupdate-bug
-# création de QTabWidgetCustom
-# Délocalisation de ThreadActions apres de nombreuses modifications
-
-
 ####################################
 ## Importation des modules python ##
 ####################################
@@ -301,9 +267,11 @@ class WinHizoTMDB(QMainWindow):
         self.InformationsTable.setColumnWidth(3, 120)
         self.InformationsTable.horizontalHeader().setStretchLastSection(True)
         self.InformationsTable.horizontalHeader().setSortIndicatorShown(True)
-        self.InformationsTable.horizontalHeader().setSortIndicatorClearable(True)
         self.InformationsTable.horizontalHeader().sectionClicked.connect(self.SortInformations)
         self.InformationsTable.verticalHeader().setVisible(False)
+
+        if QtVersion == 6:
+            self.InformationsTable.horizontalHeader().setSortIndicatorClearable(True)
 
         # Fenêtre de la table des retours, ne pas utiliser setAttribute(Qt.WA_DeleteOnClose)
         self.InformationsDialog = QDialog(self)
@@ -1654,15 +1622,28 @@ class WinHizoTMDB(QMainWindow):
 
         Languages.append({"text": 'null - Aucune', "data": "null"})
 
-        with open(f"{AbsoluteFolder}/Languages.json", "w") as f:
+        # Vérifie qu'on a les droits d'écriture sur le dossier
+        # ChatGPT propose : QFile(AbsoluteFolder).permissions() & QFileDevice.ReadUser
+        if QFileDevice.WriteUser in QFile(AbsoluteFolder).permissions():
+            File = f"{AbsoluteFolder}/Languages.json"
+        else:
+            File = f"{QDir.tempPath()}/Languages.json"
+
+        with open(File, "w") as f:
             # Enregistrer le dictionnaire en JSON dans le fichier
             json.dump(Languages, f, indent=2)
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def LoadImagesLanguages(self, Delete=False):
-        # Adresse du fichier json
-        JsonFile = QFile(f"{AbsoluteFolder}/Languages.json")
+        """Fonction chargeant les langues depuis le fichier des langues."""
+
+        # Adresse du fichier json depuis le dossier temporaire ou du logiciel
+        if QFile(f"{QDir.tempPath()}/Languages.json").exists():
+            JsonFile = QFile(f"{QDir.tempPath()}/Languages.json")
+
+        else:
+            JsonFile = QFile(f"{AbsoluteFolder}/Languages.json")
 
         # Si on doit réinitialiser le fichier
         if Delete:
@@ -1687,7 +1668,7 @@ class WinHizoTMDB(QMainWindow):
         self.ReloadLanguagesButton.setPalette(self.ReloadLanguagesButton.style().standardPalette())
 
         # Chargement du fichier json dans une liste de dictionnaires
-        with open(f"{AbsoluteFolder}/Languages.json", 'r') as f:
+        with open(JsonFile.fileName(), 'r') as f:
             # Charger le contenu du fichier en tant que dictionnaire Python
             LanguageList = json.load(f)
 
