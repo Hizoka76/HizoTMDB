@@ -1689,8 +1689,9 @@ class WinHizoTMDB(QMainWindow):
 
         # Si la sélection du dossier est OK
         if DownloadFolderTemp:
-            # Mise à jour du widget
+            # Mise à jour du widget et execution de son événement
             self.DownloadFolderWidget.setText(DownloadFolderTemp)
+            self.DownloadFolderWidget.textEdited.emit(DownloadFolderTemp)
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1906,7 +1907,7 @@ if __name__ == '__main__':
 
     # Création de l'application
     HizoTMDB = QApplication(args)
-    HizoTMDB.setApplicationVersion("23-03-05.1") # Version de l'application
+    HizoTMDB.setApplicationVersion("23-04-09.1") # Version de l'application
     HizoTMDB.setApplicationName("HizoTMDB") # Nom de l'application
     HizoTMDB.setWindowIcon(QIcon.fromTheme("hizo-tmdb", QIcon("Ressources:hizo-tmdb.png"))) # Icône de l'application
 
