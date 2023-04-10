@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 
+# News : prise en compte du cas où il n'y a aucune image à dl
+
+
 ####################################
 ## Importation des modules python ##
 ####################################
@@ -1056,6 +1059,12 @@ class WinHizoTMDB(QMainWindow):
 
         # Si la page n'a renvoyé aucun poster
         if not ReturnList[0].get("Picture"):
+            self.Progress[MovieId]["ProgressBar"].setFormat(GlobalTr["NoImagesProgress"].format(MovieId))
+            self.Progress[MovieId]["ProgressBar"].setMaximum(1)
+            self.Progress[MovieId]["ProgressBar"].setValue(1)
+            self.AppendInformation([timeNow(), 'ERROR', f"{MovieName}-{MovieId}", GlobalTr["SearchFinishNoImage"]])
+            self.ProgressBarValue(self.ProgressBarMain)
+
             # Déblocage de l'interface
             self.StopWorkinProgress()
 
@@ -1546,6 +1555,7 @@ class WinHizoTMDB(QMainWindow):
         GlobalTr["Error"] = translate("ErrorMessage", "ERROR")
         GlobalTr["Info"] = translate("InfoMessage", "INFO")
         GlobalTr["SearchFinish"] = translate("InfoMessage", "Search video completed.")
+        GlobalTr["SearchFinishNoImage"] = translate("InfoMessage", "Search video completed, no image for the defined languages.")
         GlobalTr["AutoOpenFolder"] = translate("InfoMessage", "Automatic opening of folder video.")
         GlobalTr["NameMissing"] = translate("ErrorMessage", "An error occurred when using the Movies function, the video names are missing.")
         GlobalTr["TryMax"] = translate("InfoMessage", "max number of try reached.")
@@ -1570,6 +1580,7 @@ class WinHizoTMDB(QMainWindow):
         GlobalTr["MoviesProgress"] = translate("ProgressBox", "Movies: %v / %m")
         GlobalTr["ImagesProgress"] = translate("ProgressBox", "Movie Id {} image: %v / %m")
         GlobalTr["ImagesWait"] = translate("ProgressBox", "Movie Id {} image please wait...")
+        GlobalTr["NoImagesProgress"] = translate("ProgressBox", "Movie Id {} have no image for the defined languages.")
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1907,7 +1918,7 @@ if __name__ == '__main__':
 
     # Création de l'application
     HizoTMDB = QApplication(args)
-    HizoTMDB.setApplicationVersion("23-04-09.1") # Version de l'application
+    HizoTMDB.setApplicationVersion("23.04.10.1") # Version de l'application
     HizoTMDB.setApplicationName("HizoTMDB") # Nom de l'application
     HizoTMDB.setWindowIcon(QIcon.fromTheme("hizo-tmdb", QIcon("Ressources:hizo-tmdb.png"))) # Icône de l'application
 
